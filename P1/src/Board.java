@@ -68,12 +68,14 @@ public class Board implements Ilayout, Cloneable {
                 continue;
             }
 
+            // Create new valid child state
             int temp = newBoard.board[dy][dx];
             newBoard.board[dy][dx] = 0;
             newBoard.board[this.spaceY][this.spaceX] = temp;
             newBoard.spaceX = dx;
             newBoard.spaceY = dy;
 
+            // Add child state to list
             children.add(newBoard);
         }
 
