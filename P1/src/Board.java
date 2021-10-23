@@ -61,4 +61,37 @@ public class Board implements Ilayout, Cloneable {
         }
         return output;
     }
+
+    @Override
+    public boolean equals(Object that)
+    {
+        if(that == null)
+        {
+            return false;
+        }
+
+        if(!(that instanceof Board))
+        {
+            return false;
+        }
+
+        Board other = (Board) that;
+
+        for(int i = 0; i < dim; i++)
+        {
+            if(!this.board[i].equals(other.board[i]))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public int hashCode() 
+    {
+        return super.hashCode();
+    }
 }
