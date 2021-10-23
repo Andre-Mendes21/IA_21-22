@@ -46,4 +46,19 @@ public class Board implements Ilayout, Cloneable {
     {
         return 1;
     }
+
+    public String toString()
+    {
+        String output = new String();
+
+        for(int i = 0; i < dim; i++)
+        {
+            for(int j = 0; j < dim - 1; j++)
+            {
+                output += this.board[i][j] == 0 ? " " : String.format("%d", this.board[i][j]);
+            }
+            output += this.board[i][dim-1] == 0 ? " \n" : String.format("%d\n", this.board[i][dim - 1]);
+        }
+        return output;
+    }
 }
