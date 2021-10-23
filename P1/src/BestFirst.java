@@ -63,5 +63,43 @@ public class BestFirst {
 
         opened.add((new State(s, null)));
         List<State> sucs;
+
+        while(true)
+        {
+            if(opened.isEmpty())
+            {
+                System.exit(1);
+            }
+
+            this.actual = opened.poll();
+            opened.remove(actual);
+            if(actual.layout.isGoal(objective))
+            {
+                Queue<State> solutions = new PriorityQueue<>();
+
+                State temp = actual;
+                for(; temp.father != null; temp = temp.father)
+                {
+                    solutions.add(temp);
+                }
+                solutions.add(temp);
+
+                return solutions.iterator();
+            }
+            
+            else
+            {
+                sucs = this.sucessores(actual);
+                shut.add(actual);
+
+                for (State successor : sucs) 
+                {
+                    if(!shut.contains(successor))
+                    {
+                        opened.add(successor);
+                    }    
+                }
+            }
+        }
     }
 }
