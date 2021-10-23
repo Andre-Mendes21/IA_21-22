@@ -2,8 +2,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Board implements Ilayout, Cloneable {
+    private static final int[] tuplePos = {1, 0, 0, -1, -1, 0, 0, 1}; // Up, Right, Down, Left
+
     private static final int dim = 3;
     private int board[][];
+    private int spaceX;
+    private int spaceY;
+
 
     public Board()
     {
@@ -24,15 +29,55 @@ public class Board implements Ilayout, Cloneable {
         {
             for(int j = 0; j < dim; j++)
             {
-                board[i][j] = Character.getNumericValue(str.charAt(si++));
+                this.board[i][j] = Character.getNumericValue(str.charAt(si++));
+
+                if(board[i][j] == 0)
+                {
+                    this.spaceX = j;
+                    this.spaceY = i;
+                }
             }
         }
     }
 
     @Override
+    public Object clone() throws CloneNotSupportedException
+    {
+        return super.clone();
+    }
+
+    @Override
     public List<Ilayout> children() 
     {
-       return null;
+        List<Ilayout> children = new ArrayList<>();
+        Board newBoard = new Board();
+
+        for(int i = 1; i < tuplePos.length; i += 2)
+        {
+            try {
+                newBoard = (Board) this.clone();
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();
+            }
+
+            int dx = this.spaceX - tuplePos[i];
+            int dy = this.spaceY - tuplePos[i - 1];
+
+            if((dx >= dim || dx < 0) || (dy >= dim || dy < 0)) // Checks if out-of-bounds
+            {
+                continue;
+            }
+
+            int temp = newBoard.board[dy][dx];
+            newBoard.board[dy][dx] = 0;
+            newBoard.board[this.spaceY][this.spaceX] = temp;
+            newBoard.spaceX = dx;
+            newBoard.spaceY = dy;
+
+            children.add(newBoard);
+        }
+
+        return children;
     }
 
     @Override
@@ -49,7 +94,7 @@ public class Board implements Ilayout, Cloneable {
 
     public String toString()
     {
-        String output = new String();
+        String output = "";
 
         for(int i = 0; i < dim; i++)
         {
