@@ -75,14 +75,14 @@ public class BestFirst {
             opened.remove(actual);
             if(actual.layout.isGoal(objective))
             {
-                Queue<State> solutions = new PriorityQueue<>();
+                List<State> solutions = new ArrayList<>();
 
                 State temp = actual;
                 for(; temp.father != null; temp = temp.father)
                 {
-                    solutions.add(temp);
+                    solutions.add(0, temp);
                 }
-                solutions.add(temp);
+                solutions.add(0, temp);
 
                 return solutions.iterator();
             }
