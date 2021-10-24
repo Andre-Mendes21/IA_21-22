@@ -117,5 +117,10 @@ public class Board implements Ilayout, Cloneable {
         return true;
     }
 
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
 
 }
