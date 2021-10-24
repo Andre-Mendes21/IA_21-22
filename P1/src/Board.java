@@ -91,8 +91,6 @@ public class Board implements Ilayout, Cloneable {
             }
             output.append(this.board[i][dim - 1] == 0 ? " \n" : String.format("%d\n", this.board[i][dim - 1]));
         }
-
-        // output += this.board[dim - 1][dim - 1] == 0 ? " " : String.format("%d", this.board[dim - 1][dim - 1]);
         return output.toString();
     }
 
