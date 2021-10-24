@@ -102,9 +102,11 @@ public class Board implements Ilayout, Cloneable {
             return false;
         }
 
-        if(!(that instanceof Board other)) {
+        if(!(that instanceof Board)) {
             return false;
         }
+
+        Board other = (Board) that;
 
         for(int i = 0; i < dim; i++) {
             for(int j = 0; j < dim; j++) {
