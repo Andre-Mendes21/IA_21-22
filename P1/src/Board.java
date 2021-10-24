@@ -5,7 +5,7 @@ public class Board implements Ilayout, Cloneable {
     // Up, Right, Down, Left
     private static final int[] tuplePos = {1, 0, 0, -1, -1, 0, 0, 1};
     private static final int dim = 3;
-    private int board[][];
+    private final int[][] board;
     private int spaceX;
     private int spaceY;
 
@@ -36,9 +36,7 @@ public class Board implements Ilayout, Cloneable {
     public Board(Board org) {
         this.board = new Board().board;
         for(int i = 0; i < dim; i++) {
-            for(int j = 0; j < dim; j++) {
-                this.board[i][j] = org.board[i][j];
-            }
+            System.arraycopy(org.board[i], 0, this.board[i], 0, dim);
         }
         this.spaceX = org.spaceX;
         this.spaceY = org.spaceY;
@@ -85,17 +83,17 @@ public class Board implements Ilayout, Cloneable {
     }
 
     public String toString() {
-        String output = "";
+        StringBuilder output = new StringBuilder();
 
         for(int i = 0; i < dim; i++) {
             for(int j = 0; j < dim - 1; j++) {
-                output += this.board[i][j] == 0 ? " " : String.format("%d", this.board[i][j]);
+                output.append(this.board[i][j] == 0 ? " " : String.format("%d", this.board[i][j]));
             }
-            output += this.board[i][dim-1] == 0 ? " \n" : String.format("%d\n", this.board[i][dim - 1]);
+            output.append(this.board[i][dim - 1] == 0 ? " \n" : String.format("%d\n", this.board[i][dim - 1]));
         }
 
         // output += this.board[dim - 1][dim - 1] == 0 ? " " : String.format("%d", this.board[dim - 1][dim - 1]);
-        return output;
+        return output.toString();
     }
 
     @Override
@@ -104,11 +102,9 @@ public class Board implements Ilayout, Cloneable {
             return false;
         }
 
-        if(!(that instanceof Board)) {
+        if(!(that instanceof Board other)) {
             return false;
         }
-
-        Board other = (Board) that;
 
         for(int i = 0; i < dim; i++) {
             for(int j = 0; j < dim; j++) {
@@ -122,9 +118,4 @@ public class Board implements Ilayout, Cloneable {
     }
 
 
-    @Override
-    public int hashCode() 
-    {
-        return super.hashCode();
-    }
 }
