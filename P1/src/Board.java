@@ -9,7 +9,6 @@ public class Board implements Ilayout, Cloneable {
     private int spaceX;
     private int spaceY;
 
-
     public Board()
     {
         this.board = new int[dim][dim];
@@ -40,25 +39,29 @@ public class Board implements Ilayout, Cloneable {
         }
     }
 
-    @Override
-    public Object clone() throws CloneNotSupportedException
+    public Board(Board org)
     {
-        return super.clone();
+        this.board = new Board().board;
+        for(int i = 0; i < dim; i++)
+        {
+            for(int j = 0; j < dim; j++)
+            {
+                this.board[i][j] = org.board[i][j];
+            }
+        }
+        this.spaceX = org.spaceX;
+        this.spaceY = org.spaceY;
     }
 
     @Override
     public List<Ilayout> children() 
     {
         List<Ilayout> children = new ArrayList<>();
-        Board newBoard = new Board();
+        Board newBoard;
 
         for(int i = 1; i < tuplePos.length; i += 2)
         {
-            try {
-                newBoard = (Board) this.clone();
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
-            }
+            newBoard = new Board(this);
 
             int dx = this.spaceX - tuplePos[i];
             int dy = this.spaceY - tuplePos[i - 1];
@@ -85,7 +88,7 @@ public class Board implements Ilayout, Cloneable {
     @Override
     public boolean isGoal(Ilayout l) 
     {
-        return this.equals(l);
+        return l.equals(this);
     }
 
     @Override
@@ -106,6 +109,8 @@ public class Board implements Ilayout, Cloneable {
             }
             output += this.board[i][dim-1] == 0 ? " \n" : String.format("%d\n", this.board[i][dim - 1]);
         }
+
+        // output += this.board[dim - 1][dim - 1] == 0 ? " " : String.format("%d", this.board[dim - 1][dim - 1]);
         return output;
     }
 
@@ -126,9 +131,12 @@ public class Board implements Ilayout, Cloneable {
 
         for(int i = 0; i < dim; i++)
         {
-            if(!this.board[i].equals(other.board[i]))
+            for(int j = 0; j < dim; j++)
             {
-                return false;
+                if(other.board[i][j] != this.board[i][j])
+                {
+                    return false;
+                }
             }
         }
 
