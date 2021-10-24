@@ -2,9 +2,9 @@ import java.util.*;
 
 public class BestFirst {
     static class State {
-        private Ilayout layout;
-        private State father;
-        private double g;
+        private final Ilayout layout;
+        private final State father;
+        private final double g;
 
         public State(Ilayout l, State n) {
             this.layout = l;
@@ -28,11 +28,8 @@ public class BestFirst {
     }
 
     protected Queue<State> opened;
-    private List<State> shut;
-    private State actual;
-    private Ilayout objective;
 
-    final private List<State> sucessores(State n) {
+    private List<State> sucessores(State n) {
         List<State> sucs = new ArrayList<>();
         List<Ilayout> children = n.layout.children();
         
@@ -46,9 +43,8 @@ public class BestFirst {
     }
 
     final public Iterator<State> solve(Ilayout s, Ilayout goal) {
-        this.objective = goal;
         opened = new PriorityQueue<>(10, (s1, s2) -> (int) Math.signum(s1.getG() - s2.getG()));
-        shut = new ArrayList<>();
+        List<State> shut = new ArrayList<>();
         opened.add((new State(s, null)));
         List<State> sucs;
 
@@ -57,10 +53,10 @@ public class BestFirst {
                 System.exit(1);
             }
 
-            this.actual = opened.poll();
+            State actual = opened.poll();
             opened.remove(actual);
 
-            if(actual.layout.isGoal(objective)) {
+            if(actual.layout.isGoal(goal)) {
                 List<State> solutions = new ArrayList<>();
                 State temp = actual;
                 for(; temp.father != null; temp = temp.father) {
