@@ -1,53 +1,40 @@
 import java.util.*;
 
 public class BestFirst {
+    static class State {
+        private final Ilayout layout;
+        private final State father;
+        private final double g;
 
-    static class State{
-        private Ilayout layout;
-        private State father;
-        private double g;
-
-        public State(Ilayout l, State n)
-        {
+        public State(Ilayout l, State n) {
             this.layout = l;
             this.father = n;
 
-            if(father != null)
-            {
+            if(father != null) {
                 g = father.g + l.getG();
             }
-
-            else
-            {
+            else {
                 g = 0.0f;
             }
         }
 
-        public String toString()
-        {
+        public String toString() {
             return layout.toString();
         }
 
-        public double getG()
-        {
+        public double getG() {
             return g;
         }
     }
 
     protected Queue<State> opened;
-    private List<State> shut;
-    private State actual;
-    private Ilayout objective;
 
-    final private List<State> sucessores(State n)
-    {
+    private List<State> sucessores(State n) {
         List<State> sucs = new ArrayList<>();
         List<Ilayout> children = n.layout.children();
         
-        for(Ilayout e: children)
-        {
-            if(n.father == null || !e.equals(n.father.layout))
-            {
+        for(Ilayout e: children) {
+            if(n.father == null || !e.equals(n.father.layout)) {
                 State newState = new State(e, n);
                 sucs.add(newState);
             }
@@ -55,47 +42,34 @@ public class BestFirst {
         return sucs;
     }
 
-    final public Iterator<State> solve(Ilayout s, Ilayout goal)
-    {
-        this.objective = goal;
+    final public Iterator<State> solve(Ilayout s, Ilayout goal) {
         opened = new PriorityQueue<>(10, (s1, s2) -> (int) Math.signum(s1.getG() - s2.getG()));
-        shut = new ArrayList<>();
-
+        List<State> shut = new ArrayList<>();
         opened.add((new State(s, null)));
         List<State> sucs;
 
-        while(true)
-        {
-            if(opened.isEmpty())
-            {
+        while(true) {
+            if(opened.isEmpty()) {
                 System.exit(1);
             }
 
-            this.actual = opened.poll();
+            State actual = opened.poll();
             opened.remove(actual);
-            if(actual.layout.isGoal(objective))
-            {
-                List<State> solutions = new ArrayList<>();
 
+            if(actual.layout.isGoal(goal)) {
+                List<State> solutions = new ArrayList<>();
                 State temp = actual;
-                for(; temp.father != null; temp = temp.father)
-                {
+                for(; temp.father != null; temp = temp.father) {
                     solutions.add(0, temp);
                 }
                 solutions.add(0, temp);
-
                 return solutions.iterator();
             }
-            
-            else
-            {
+            else {
                 sucs = this.sucessores(actual);
                 shut.add(actual);
-
-                for (State successor : sucs) 
-                {
-                    if(!shut.contains(successor))
-                    {
+                for(State successor : sucs) {
+                    if(!shut.contains(successor)) {
                         opened.add(successor);
                     }    
                 }

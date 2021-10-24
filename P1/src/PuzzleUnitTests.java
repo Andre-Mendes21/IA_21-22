@@ -5,8 +5,7 @@ import static org.junit.Assert.*;
 
 public class PuzzleUnitTests {
     @Test
-    public void testConstructor()
-    {
+    public void testConstructor() {
         Board b = new Board("023145678");
         StringWriter writer = new StringWriter();
         PrintWriter pw = new PrintWriter(writer);
@@ -18,8 +17,7 @@ public class PuzzleUnitTests {
     }
 
     @Test
-    public void testConstructor2()
-    {
+    public void testConstructor2() {
         Board b = new Board("123485670");
         StringWriter writer = new StringWriter();
         PrintWriter pw = new PrintWriter(writer);
