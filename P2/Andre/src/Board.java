@@ -27,12 +27,13 @@ public class Board implements Ilayout, Cloneable {
         List<Ilayout> children = new ArrayList<>();
         
         for(int i = 0; i < dim; i++) {
-            for(int j = 1; j <= 2; j++) {
-                Board newBoard = new Board(this);
-
-                if(newBoard.jug[i] == 0) {
+            for(int j = 1; j < dim; j++) {
+                
+                if(this.jug[i] == 0) {
                     continue;
                 }
+
+                Board newBoard = new Board(this);
                 int nextJug = (i + j) % dim;
 
                 int fillJug = Math.min(newBoard.jug[nextJug] + newBoard.jug[i], newBoard.jugCapacity[nextJug]);
