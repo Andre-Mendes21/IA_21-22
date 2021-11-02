@@ -1,40 +1,25 @@
-package src;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class Board implements Ilayout, Cloneable {
-    // Up, Right, Down, Left
     private static final int dim = 3;
     private final int[] jug;
-    private final int[] jugCapacity;
+    private final int[] jugCapacity = {8, 5, 3};
 
     public Board() {
         this.jug = new int[dim];
-        this.jugCapacity = new int[dim];
     }
 
-    public Board(String str, int[] capacity) throws IllegalStateException {
-        if (str.length() != dim && capacity.length != dim) {
+    public Board(int[] input) throws IllegalStateException {
+        if (input.length != dim) {
             throw new IllegalStateException("Invalid arg in Board constructor");
         }
-
-        this.jug = new int[dim];
-        this.jugCapacity = capacity;
-
-        String[] jugs = str.split(" ");
-
-        for(int i = 0; i < dim; i++) {
-            this.jug[i] = Integer.parseInt(jugs[i]);
-        }
+        this.jug = input;
     }
 
     public Board(Board org) {
         this.jug = new Board().jug;
-        this.jugCapacity = new Board().jugCapacity;
-
         System.arraycopy(org.jug, 0, this.jug, 0, dim);
-        System.arraycopy(org.jugCapacity, 0, this.jugCapacity, 0, dim);
     }
 
     @Override
@@ -50,10 +35,8 @@ public class Board implements Ilayout, Cloneable {
                 }
                 int nextJug = (i + j) % dim;
 
-                int fillJug = (newBoard.jug[nextJug] + newBoard.jug[i]) > newBoard.jugCapacity[nextJug] ? newBoard.jugCapacity[nextJug] 
-                                                                                                        : (newBoard.jug[nextJug] + newBoard.jug[i]); 
-                int emptyJug = (newBoard.jug[i] - (newBoard.jugCapacity[nextJug] - newBoard.jug[nextJug])) < 0 ? 0 
-                                                                                                                : (newBoard.jug[i] - (newBoard.jugCapacity[nextJug] - newBoard.jug[nextJug]));
+                int fillJug = Math.min(newBoard.jug[nextJug] + newBoard.jug[i], newBoard.jugCapacity[nextJug]);
+                int emptyJug = Math.max(newBoard.jug[i] - (newBoard.jugCapacity[nextJug] - newBoard.jug[nextJug]), 0);
 
                 if(fillJug == newBoard.jug[nextJug] && emptyJug == newBoard.jug[i]) {
                     continue;
