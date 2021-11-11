@@ -1,10 +1,11 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Board implements Ilayout, Cloneable {
     private static final int dim = 3;
     private final int[] jug;
-    private final int[] jugCapacity = {8, 5, 3};
+    private final int[] jugCapacity = { 8, 5, 3 };
 
     public Board() {
         this.jug = new int[dim];
@@ -17,21 +18,20 @@ public class Board implements Ilayout, Cloneable {
         this.jug = input;
     }
 
-    public Board(Board org) {
+    public Board(Board orig) {
         this.jug = new Board().jug;
-        System.arraycopy(org.jug, 0, this.jug, 0, dim);
+        System.arraycopy(orig.jug, 0, this.jug, 0, dim);
     }
 
     @Override
     public List<Ilayout> children() {
         List<Ilayout> children = new ArrayList<>();
-        
+
         for(int i = 0; i < dim; i++) {
+            if (this.jug[i] == 0) {
+                continue;
+            }
             for(int j = 1; j < dim; j++) {
-                
-                if(this.jug[i] == 0) {
-                    continue;
-                }
 
                 Board newBoard = new Board(this);
                 int nextJug = (i + j) % dim;
@@ -39,7 +39,7 @@ public class Board implements Ilayout, Cloneable {
                 int fillJug = Math.min(newBoard.jug[nextJug] + newBoard.jug[i], newBoard.jugCapacity[nextJug]);
                 int emptyJug = Math.max(newBoard.jug[i] - (newBoard.jugCapacity[nextJug] - newBoard.jug[nextJug]), 0);
 
-                if(fillJug == newBoard.jug[nextJug] && emptyJug == newBoard.jug[i]) {
+                if (fillJug == newBoard.jug[nextJug] && emptyJug == newBoard.jug[i]) {
                     continue;
                 }
                 newBoard.jug[nextJug] = fillJug;
@@ -85,12 +85,7 @@ public class Board implements Ilayout, Cloneable {
 
         Board other = (Board) that;
 
-        for(int i = 0; i < dim; i++) {
-            if(other.jug[i] != this.jug[i]) {
-                return false;
-            }
-        }
-        return true;
+        return Arrays.equals(other.jug, this.jug);
     }
 
     @Override
