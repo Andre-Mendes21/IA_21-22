@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class BestFirst {
+public class AStar {
     static class State {
         private final Ilayout layout;
         private final State father;
@@ -17,15 +17,19 @@ public class BestFirst {
                 g = 0.0f;
             }
         }
-        
+
         public String toString() {
             return layout.toString();
         }
-
+        
         public double getG() {
             return g;
         }
-
+        
+        public double getH(Ilayout goal) {
+            return layout.getH(goal);
+        }
+        
         @Override
         public boolean equals(Object that) {
             if (that == null) {
@@ -46,7 +50,7 @@ public class BestFirst {
             return super.hashCode();
         }
     }
-    
+
     protected Queue<State> opened;
 
     private List<State> sucessores(State n) {
@@ -63,7 +67,7 @@ public class BestFirst {
     }
 
     final public Iterator<State> solve(Ilayout s, Ilayout goal) {
-        opened = new PriorityQueue<>(10, (s1, s2) -> (int) Math.signum(s1.getG() - s2.getG()));
+        opened = new PriorityQueue<>(10, (s1, s2) -> (int) Math.signum((s1.getG() + s1.getH(goal)) - (s2.getG() + s2.getH(goal))));
         List<State> shut = new ArrayList<>();
         opened.add((new State(s, null)));
         List<State> sucs;

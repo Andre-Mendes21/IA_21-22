@@ -3,24 +3,39 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Jug implements Ilayout, Cloneable {
-    private static final int dim = 3;
-    private final int[] jug;
-    private final int[] jugCapacity = { 8, 5, 3 };
+    private final int dim;
+    private final int[] jugs;
+    private final int[] jugsCapacity;
 
     public Jug() {
-        this.jug = new int[dim];
+        this.dim = 3;
+        this.jugs = new int[dim];
+        this.jugsCapacity = new int[dim];
     }
 
-    public Jug(int[] input) throws IllegalStateException {
-        if (input.length != dim) {
+    public Jug(String jugsCapacity, String currJugs) throws IllegalStateException {
+        String[] jugsCapacityArr = jugsCapacity.split(" ");
+        String[] currJugsArr = currJugs.split(" ");
+
+        if (jugsCapacityArr.length != currJugsArr.length) {
             throw new IllegalStateException("Invalid arg in Jug constructor");
         }
-        this.jug = input;
+        this.jugsCapacity = Arrays.stream(jugsCapacityArr)
+                                    .mapToInt(Integer :: parseInt)
+                                    .toArray();
+        this.jugs = Arrays.stream(currJugsArr)
+                            .mapToInt(Integer :: parseInt)
+                            .toArray();
+        this.dim = this.jugsCapacity.length;
     }
 
     public Jug(Jug orig) {
-        this.jug = new Jug().jug;
-        System.arraycopy(orig.jug, 0, this.jug, 0, dim);
+        this.dim = orig.dim;
+        this.jugs = new int[this.dim];
+        this.jugsCapacity = new int[this.dim];
+
+        System.arraycopy(orig.jugs, 0, this.jugs, 0, this.dim);
+        System.arraycopy(orig.jugsCapacity, 0, this.jugsCapacity, 0, this.dim);
     }
 
     @Override
@@ -28,7 +43,7 @@ public class Jug implements Ilayout, Cloneable {
         List<Ilayout> children = new ArrayList<>();
 
         for(int i = 0; i < dim; i++) {
-            if (this.jug[i] == 0) {
+            if (this.jugs[i] == 0) {
                 continue;
             }
             for(int j = 1; j < dim; j++) {
@@ -36,20 +51,32 @@ public class Jug implements Ilayout, Cloneable {
                 Jug newJug = new Jug(this);
                 int nextJug = (i + j) % dim;
 
-                int fillJug = Math.min(newJug.jug[nextJug] + newJug.jug[i], newJug.jugCapacity[nextJug]);
-                int emptyJug = Math.max(newJug.jug[i] - (newJug.jugCapacity[nextJug] - newJug.jug[nextJug]), 0);
+                int fillJug = Math.min(newJug.jugs[nextJug] + newJug.jugs[i], newJug.jugsCapacity[nextJug]);
+                int emptyJug = Math.max(newJug.jugs[i] - (newJug.jugsCapacity[nextJug] - newJug.jugs[nextJug]), 0);
 
-                if (fillJug == newJug.jug[nextJug] && emptyJug == newJug.jug[i]) {
+                if (fillJug == newJug.jugs[nextJug] && emptyJug == newJug.jugs[i]) {
                     continue;
                 }
-                newJug.jug[nextJug] = fillJug;
-                newJug.jug[i] = emptyJug;
+                newJug.jugs[nextJug] = fillJug;
+                newJug.jugs[i] = emptyJug;
 
                 children.add(newJug);
             }
         }
 
         return children;
+    }
+
+    public double getH(Ilayout l) {
+
+        Jug objective = (Jug) l;
+        double result = 0f;
+        
+        for(int i = 0; i < dim; i++) {
+            result += Math.min(Math.abs(objective.jugs[i] - this.jugs[i]), 1);
+        }
+
+        return result;
     }
 
     @Override
@@ -62,13 +89,22 @@ public class Jug implements Ilayout, Cloneable {
         return 1;
     }
 
+    int[] getJugsCapacity() {
+        return this.jugsCapacity;
+    }
+
+    int[] getCurrJugs() {
+        return this.jugs;
+    }
+
+    @Override
     public String toString() {
         StringBuilder output = new StringBuilder();
 
         for (int i = 0; i < dim - 1; i++) {
-            output.append(this.jug[i] + " ");
+            output.append(this.jugs[i] + " ");
         }
-        output.append(this.jug[dim - 1]);
+        output.append(this.jugs[dim - 1]);
 
         return output.toString();
     }
@@ -85,7 +121,7 @@ public class Jug implements Ilayout, Cloneable {
 
         Jug other = (Jug) that;
 
-        return Arrays.equals(other.jug, this.jug);
+        return Arrays.equals(other.jugs, this.jugs);
     }
 
     @Override

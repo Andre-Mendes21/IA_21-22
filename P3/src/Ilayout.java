@@ -16,4 +16,9 @@ public interface Ilayout {
      * @return the cost for moving from the input config to the receiver.
     */
     double getG();
+
+    /**
+     * @return the estimated cost of the solution still to discover
+     */
+    double getH(Ilayout l);
 }
