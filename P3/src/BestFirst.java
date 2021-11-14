@@ -17,6 +17,14 @@ public class BestFirst {
                 g = 0.0f;
             }
         }
+        
+        public String toString() {
+            return layout.toString();
+        }
+
+        public double getG() {
+            return g;
+        }
 
         @Override
         public boolean equals(Object that) {
@@ -33,15 +41,12 @@ public class BestFirst {
             return other.layout.equals(this.layout);
         }
 
-        public String toString() {
-            return layout.toString();
-        }
-
-        public double getG() {
-            return g;
+        @Override
+        public int hashCode() {
+            return super.hashCode();
         }
     }
-
+    
     protected Queue<State> opened;
 
     private List<State> sucessores(State n) {
