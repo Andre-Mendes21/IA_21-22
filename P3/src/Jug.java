@@ -67,6 +67,18 @@ public class Jug implements Ilayout, Cloneable {
         return children;
     }
 
+    public double getH(Ilayout l) {
+
+        Jug objective = (Jug) l;
+        double result = 0f;
+        
+        for(int i = 0; i < dim; i++) {
+            result += Math.min(Math.abs(objective.jugs[i] - this.jugs[i]), 1);
+        }
+
+        return result;
+    }
+
     @Override
     public boolean isGoal(Ilayout l) {
         return l.equals(this);
