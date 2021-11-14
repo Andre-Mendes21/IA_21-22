@@ -18,6 +18,21 @@ public class BestFirst {
             }
         }
 
+        @Override
+        public boolean equals(Object that) {
+            if (that == null) {
+                return false;
+            }
+    
+            if (!(that instanceof State)) {
+                return false;
+            }
+    
+            State other = (State) that;
+    
+            return other.layout.equals(this.layout);
+        }
+
         public String toString() {
             return layout.toString();
         }
