@@ -1,59 +1,88 @@
 import org.junit.Test;
 import java.util.Iterator;
+import java.util.*;
 import static org.junit.Assert.*;
 
 public class JugUnitTests {
     @Test
     public void testConstructor() {
-        int[] in = {8, 0, 0};
-        Jug b = new Jug(in);
-        String expected = new String("8 0 0");
-        assertEquals(expected, b.toString());
+        String jugsCapacity = "8 5 3";
+        String currJugs = "8 0 0";
+
+        String expectedJugCapacity = new String("8 5 3");
+        String expectedCurrJugs = new String("8 0 0");
+        
+        Jug b = new Jug(jugsCapacity, currJugs);
+
+        assertEquals(expectedJugCapacity, Arrays.toString(b.getJugsCapacity()).replaceAll("\\[|\\]|,|", ""));
+        assertEquals(expectedCurrJugs, Arrays.toString(b.getCurrJugs()).replaceAll("\\[|\\]|,|", ""));
     }
 
     @Test
     public void testConstructor2() {
-        int[] in = {4, 1, 3};
-        Jug b = new Jug(in);
-        String expected = new String("4 1 3");
-        assertEquals(expected, b.toString());
+        String jugsCapacity = "21 13 8 5 3";
+        String currJugs = "21 0 0 0 0";
+
+        String expectedJugCapacity = new String("21 13 8 5 3");
+        String expectedCurrJugs = new String("21 0 0 0 0");
+        
+        Jug b = new Jug(jugsCapacity, currJugs);
+
+        assertEquals(expectedJugCapacity, Arrays.toString(b.getJugsCapacity()).replaceAll("\\[|\\]|,|", ""));
+        assertEquals(expectedCurrJugs, Arrays.toString(b.getCurrJugs()).replaceAll("\\[|\\]|,|", ""));
     }
 
     @Test
-    public void testSolve() {
-        int[] in = {8, 0, 0};
-        int[] out = {0, 5, 3};
-        String[] expected1 = {"8 0 0", "3 5 0", "0 5 3"};
+    public void testBestFirstSolve() {
+        String jugsCapacity = "8 5 3";
+        String currJugs = "8 0 0";
+        String out = "0 5 3";
+        double expected = 2f;
         BestFirst s = new BestFirst();
-        Iterator<BestFirst.State> it = s.solve(new Jug(in), new Jug(out));
+        Iterator<BestFirst.State> it = s.solve(new Jug(jugsCapacity, currJugs), new Jug(jugsCapacity, out));
 
         int j = 0;
         while(it.hasNext()) {
             BestFirst.State i = it.next();
-            assertEquals(expected1[j++], i.toString());
+            if(!it.hasNext()) {
+                assertEquals(String.format("%.0f", expected), String.format("%.0f", i.getG()));
+            }
         }
     }
 
     @Test
-    public void testSolve2() {
-        int[] in = {8, 0, 0};
-        int[] out = {4, 1, 3};
-        String[] expected1 = {
-                            "8 0 0", 
-                            "5 0 3", 
-                            "5 3 0", 
-                            "2 3 3", 
-                            "2 5 1", 
-                            "7 0 1", 
-                            "7 1 0", 
-                            "4 1 3"};
+    public void testBestFirstSolve2() {
+        String jugsCapacity = "21 13 8 5 3";
+        String currJugs = "21 0 0 0 0";
+        String out = "6 4 4 4 3";
+        double expected = 13f;
         BestFirst s = new BestFirst();
-        Iterator<BestFirst.State> it = s.solve(new Jug(in), new Jug(out));
+        Iterator<BestFirst.State> it = s.solve(new Jug(jugsCapacity, currJugs), new Jug(jugsCapacity, out));
 
         int j = 0;
         while(it.hasNext()) {
             BestFirst.State i = it.next();
-            assertEquals(expected1[j++], i.toString());
+            if(!it.hasNext()) {
+                assertEquals(String.format("%.0f", expected), String.format("%.0f", i.getG()));
+            }
+        }
+    }
+
+    @Test
+    public void testBestFirstSolve3() {
+        String jugsCapacity = "8 7 6 5 4 3 2 1";
+        String currJugs = "0 0 0 0 4 3 2 1";
+        String out = "1 1 1 1 1 3 1 1";
+        double expected = 8f;
+        BestFirst s = new BestFirst();
+        Iterator<BestFirst.State> it = s.solve(new Jug(jugsCapacity, currJugs), new Jug(jugsCapacity, out));
+
+        int j = 0;
+        while(it.hasNext()) {
+            BestFirst.State i = it.next();
+            if(!it.hasNext()) {
+                assertEquals(String.format("%.0f", expected), String.format("%.0f", i.getG()));
+            }
         }
     }
 }
