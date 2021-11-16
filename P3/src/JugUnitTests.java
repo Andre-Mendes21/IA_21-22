@@ -49,7 +49,7 @@ public class JugUnitTests {
         }
     }
 
-    @Test
+    @Test (timeout = 2000)
     public void testBestFirstSolve2() {
         String jugsCapacity = "21 13 8 5 3";
         String currJugs = "21 0 0 0 0";
@@ -77,6 +77,59 @@ public class JugUnitTests {
 
         while(it.hasNext()) {
             BestFirst.State i = it.next();
+            if(!it.hasNext()) {
+                assertEquals(String.format("%.0f", expected), String.format("%.0f", i.getG()));
+            }
+        }
+    }
+
+    /*============================== IDS Tests ==============================*/
+
+    @Test (timeout = 2)
+    public void testIDSSolve() {
+        String jugsCapacity = "8 5 3";
+        String currJugs = "8 0 0";
+        String out = "0 5 3";
+        double expected = 2f;
+        IDS s = new IDS();
+        Iterator<IDS.State> it = s.solve(new Jug(jugsCapacity, currJugs), new Jug(jugsCapacity, out));
+
+        while(it.hasNext()) {
+            IDS.State i = it.next();
+            if(!it.hasNext()) {
+                assertEquals(String.format("%.0f", expected), String.format("%.0f", i.getG()));
+            }
+        }
+    }
+
+    @Test (timeout = 2000)
+    public void testIDSSolve2() {
+        String jugsCapacity = "21 13 8 5 3";
+        String currJugs = "21 0 0 0 0";
+        String out = "6 4 4 4 3";
+        double expected = 13f;
+        IDS s = new IDS();
+        Iterator<IDS.State> it = s.solve(new Jug(jugsCapacity, currJugs), new Jug(jugsCapacity, out));
+
+        while(it.hasNext()) {
+            IDS.State i = it.next();
+            if(!it.hasNext()) {
+                assertEquals(String.format("%.0f", expected), String.format("%.0f", i.getG()));
+            }
+        }
+    }
+
+    @Test (timeout = 2000)
+    public void testIDSSolve3() {
+        String jugsCapacity = "8 7 6 5 4 3 2 1";
+        String currJugs = "0 0 0 0 4 3 2 1";
+        String out = "1 1 1 1 1 3 1 1";
+        double expected = 8f;
+        IDS s = new IDS();
+        Iterator<IDS.State> it = s.solve(new Jug(jugsCapacity, currJugs), new Jug(jugsCapacity, out));
+
+        while(it.hasNext()) {
+            IDS.State i = it.next();
             if(!it.hasNext()) {
                 assertEquals(String.format("%.0f", expected), String.format("%.0f", i.getG()));
             }
@@ -152,7 +205,7 @@ public class JugUnitTests {
         }
     }
 
-    @Test
+    @Test 
     public void testAStarSolve3() {
         String jugsCapacity = "8 7 6 5 4 3 2 1";
         String currJugs = "0 0 0 0 4 3 2 1";
