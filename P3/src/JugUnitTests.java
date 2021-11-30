@@ -1,4 +1,6 @@
 import org.junit.Test;
+import org.junit.jupiter.api.Timeout;
+
 import java.util.Iterator;
 import java.util.*;
 import static org.junit.Assert.*;
@@ -155,7 +157,7 @@ public class JugUnitTests {
         }
     }
 
-    @Test
+    @Test (timeout = 200)
     public void testAStarSolve2() {
         String jugsCapacity = "21 13 8 5 3";
         String currJugs = "21 0 0 0 0";
@@ -221,4 +223,90 @@ public class JugUnitTests {
             }
         }
     }
+
+    /*============================== IDA* Tests ==============================*/
+
+    // @Test
+    // public void testIDASolve() {
+    //     String jugsCapacity = "8 5 3";
+    //     String currJugs = "8 0 0";
+    //     String out = "0 5 3";
+    //     double expected = 2f;
+    //     IDA s = new IDA();
+    //     Iterator<IDA.State> it = s.solve(new Jug(jugsCapacity, currJugs), new Jug(jugsCapacity, out));
+
+    //     while(it.hasNext()) {
+    //         IDA.State i = it.next();
+    //         if(!it.hasNext()) {
+    //             assertEquals(String.format("%.0f", expected), String.format("%.0f", i.getG()));
+    //         }
+    //     }
+    // }
+
+    // @Test
+    // public void testIDASolve2() {
+    //     String jugsCapacity = "21 13 8 5 3";
+    //     String currJugs = "21 0 0 0 0";
+    //     String out = "6 4 4 4 3";
+    //     double expected = 13f;
+    //     IDA s = new IDA();
+    //     Iterator<IDA.State> it = s.solve(new Jug(jugsCapacity, currJugs), new Jug(jugsCapacity, out));
+
+    //     while(it.hasNext()) {
+    //         IDA.State i = it.next();
+    //         if(!it.hasNext()) {
+    //             assertEquals(String.format("%.0f", expected), String.format("%.0f", i.getG()));
+    //         }
+    //     }
+    // }
+
+    // @Test
+    // public void testIDASolve2Expanded() {
+    //     String jugsCapacity = "21 13 8 5 3";
+    //     String currJugs = "21 0 0 0 0";
+    //     String out = "6 4 4 4 3";
+
+    //     String[] expected = {
+    //         "21 0 0 0 0",
+    //         "16 0 0 5 0",
+    //         "16 0 0 2 3",
+    //         "16 0 3 2 0",
+    //         "3 13 3 2 0",
+    //         "3 10 3 2 3",
+    //         "3 10 6 2 0",
+    //         "3 10 6 0 2",
+    //         "3 10 1 5 2",
+    //         "3 10 1 4 3",
+    //         "3 10 4 4 0",
+    //         "3 7 4 4 3",
+    //         "6 7 4 4 0",
+    //         "6 4 4 4 3" };
+        
+
+    //     IDA s = new IDA();
+    //     Iterator<IDA.State> it = s.solve(new Jug(jugsCapacity, currJugs), new Jug(jugsCapacity, out));
+
+    //     int j = 0;
+    //     while(it.hasNext()) {
+    //         IDA.State i = it.next();
+    //         assertEquals(expected[j++], i.toString());
+    //     }
+    // }
+
+    // @Test 
+    // public void testIDASolve3() {
+    //     String jugsCapacity = "8 7 6 5 4 3 2 1";
+    //     String currJugs = "0 0 0 0 4 3 2 1";
+    //     String out = "1 1 1 1 1 3 1 1";
+    //     double expected = 8f;
+    //     IDA s = new IDA();
+    //     Iterator<IDA.State> it = s.solve(new Jug(jugsCapacity, currJugs), new Jug(jugsCapacity, out));
+
+    //     while(it.hasNext()) {
+    //         IDA.State i = it.next();
+    //         if(!it.hasNext()) {
+    //             assertEquals(String.format("%.0f", expected), String.format("%.0f", i.getG()));
+    //         }
+    //     }
+    // }
 }

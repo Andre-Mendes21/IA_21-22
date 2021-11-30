@@ -68,7 +68,7 @@ public class AStar {
 
     final public Iterator<State> solve(Ilayout s, Ilayout goal) {
         opened = new PriorityQueue<>(10, (s1, s2) -> (int) Math.signum((s1.getG() + s1.getH(goal)) - (s2.getG() + s2.getH(goal))));
-        List<State> shut = new ArrayList<>();
+        HashSet<State> shut = new HashSet<>();
         opened.add((new State(s, null)));
         List<State> sucs;
 
