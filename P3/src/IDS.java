@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class AStar {
+public class IDS {
     static class State {
         private final Ilayout layout;
         private final State father;
@@ -17,19 +17,15 @@ public class AStar {
                 g = 0.0f;
             }
         }
-
+        
         public String toString() {
             return layout.toString();
         }
-        
+
         public double getG() {
             return g;
         }
-        
-        public double getH(Ilayout goal) {
-            return layout.getH(goal);
-        }
-        
+
         @Override
         public boolean equals(Object that) {
             if (that == null) {
@@ -50,9 +46,7 @@ public class AStar {
             return super.hashCode();
         }
     }
-
-    protected Queue<State> opened;
-
+    
     private List<State> sucessores(State n) {
         List<State> sucs = new ArrayList<>();
         List<Ilayout> children = n.layout.children();
@@ -66,37 +60,58 @@ public class AStar {
         return sucs;
     }
 
-    final public Iterator<State> solve(Ilayout s, Ilayout goal) {
-        opened = new PriorityQueue<>(10, (s1, s2) -> (int) Math.signum((s1.getG() + s1.getH(goal)) - (s2.getG() + s2.getH(goal))));
-        HashSet<State> shut = new HashSet<>();
-        opened.add((new State(s, null)));
+    private State DLS(Ilayout s, Ilayout goal, int limit) {
+        Stack<State> frontier = new Stack<State>();
+        Set<State> visited = new HashSet<State>();
+        State result = null;
         List<State> sucs;
+        
+        frontier.push(new State(s, null));
+        while(!frontier.isEmpty()) {
+            State actual = frontier.pop();
 
-        while(true) {
-            if(opened.isEmpty()) {
+            if(actual.layout.isGoal(goal)) {
+                return actual;
+            }
+
+            if(actual.getG() > limit) {
+                result = actual;
+            }
+
+            else {
+                visited.add(actual);
+                sucs = this.sucessores(actual);
+                
+                for (State state : sucs) {
+                    if(!visited.contains(state)) {
+                        frontier.add(state);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    final public Iterator<State> solve(Ilayout s, Ilayout goal) {
+        State result;
+
+        for(int i = 0; ; i++) {
+            result = DLS(s, goal, i);
+
+            if(result == null) {
                 System.exit(1);
             }
 
-            State actual = opened.poll();
-            
-            if(actual.layout.isGoal(goal)) {
+            else if(result.layout.isGoal(goal)) {
                 List<State> solutions = new ArrayList<>();
-                State temp = actual;
+                State temp = result;
                 for(; temp.father != null; temp = temp.father) {
                     solutions.add(0, temp);
                 }
                 solutions.add(0, temp);
                 return solutions.iterator();
             }
-            else {
-                sucs = this.sucessores(actual);
-                shut.add(actual);
-                for(State successor : sucs) {
-                    if(!shut.contains(successor) && !opened.contains(successor)) {
-                        opened.add(successor);
-                    }    
-                }
-            }
         }
     }
 }
+

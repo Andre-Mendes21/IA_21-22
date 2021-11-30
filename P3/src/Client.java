@@ -4,21 +4,20 @@ public class Client {
 
     public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
-        BestFirst s = new BestFirst();
+        AStar s = new AStar();
 
         String jugsCapacity = sc.nextLine().trim();
         String currJugs = sc.nextLine().trim();
         String objective = sc.nextLine().trim();
 
-        Iterator<BestFirst.State> it = s.solve(new Jug(jugsCapacity, currJugs), new Jug(jugsCapacity, objective));
+        Iterator<AStar.State> it = s.solve(new Jug(jugsCapacity, currJugs), new Jug(jugsCapacity, objective));
 
         if(it == null) {
             System.out.println("no solution was found");
         }
         else {
             while(it.hasNext()) {
-                BestFirst.State i = it.next();
-                System.out.println(i);
+                AStar.State i = it.next();
                 if(!it.hasNext()) {
                     System.out.println(String.format("%.0f", i.getG()));
                 }
