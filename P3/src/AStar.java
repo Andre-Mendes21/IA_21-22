@@ -68,15 +68,15 @@ public class AStar {
 
     final public Iterator<State> solve(Ilayout s, Ilayout goal) {
         opened = new PriorityQueue<>(10, (s1, s2) -> (int) Math.signum((s1.getG() + s1.getH(goal)) - (s2.getG() + s2.getH(goal))));
-        HashSet<State> shut = new HashSet<>();
+        Map<String, State> shut = new HashMap<>();
         opened.add((new State(s, null)));
         List<State> sucs;
-
+        
         while(true) {
             if(opened.isEmpty()) {
                 System.exit(1);
             }
-
+            
             State actual = opened.poll();
             
             if(actual.layout.isGoal(goal)) {
@@ -90,9 +90,10 @@ public class AStar {
             }
             else {
                 sucs = this.sucessores(actual);
-                shut.add(actual);
+                String key = actual.layout.toString();
+                shut.put(key, actual);
                 for(State successor : sucs) {
-                    if(!shut.contains(successor) && !opened.contains(successor)) {
+                    if(!shut.containsKey(successor.layout.toString()) && !opened.contains(successor)) {
                         opened.add(successor);
                     }    
                 }
