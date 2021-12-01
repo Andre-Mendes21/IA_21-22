@@ -1,0 +1,13 @@
+Para carregar o pacman no eclipse:
+
+File -> New -> Java Project
+  unckeck: use default location
+  Browse- selecionar a raiz do diretório onde o pacman está instalado.
+  Finish
+
+
+Para correr, ir para a class principal:
+	pacman\src\screenpac.model.Game 
+e correr.
+
+jvo, March 7, 2012
