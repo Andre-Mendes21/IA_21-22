@@ -1,8 +1,8 @@
 package games.pacman.features;
 
 import games.pacman.ghost.Ghost;
-import games.pacman.features.NodeScore;
 import games.pacman.maze.MazeNode;
+// import games.pacman.features.NodeScore;
 
 import java.util.HashMap;
 

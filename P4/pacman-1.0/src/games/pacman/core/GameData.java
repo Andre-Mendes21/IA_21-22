@@ -17,7 +17,7 @@ public class GameData {
         this.pacMan = pacMan;
     }
 
-    public double pillDist(MazeNode node, ArrayList pills) {
+    public double pillDist(MazeNode node, ArrayList<MazeNode> pills) {
         double d = maze.h * 2;
         for (Object pill1 : pills) {
             // find closest junction

@@ -1,7 +1,7 @@
 package screenpac.features;
 
 import screenpac.model.Node;
-import screenpac.model.GameState;
+// import screenpac.model.GameState;
 import screenpac.model.GameStateInterface;
 
 import java.awt.*;

@@ -28,10 +28,12 @@ public class GameStateView extends JComponent implements Constants {
         KeyController kc = new KeyController();
         fr.addKeyListener(kc);
         int dir = NEUTRAL;
+
+        int[] ghostDirs = { NEUTRAL, NEUTRAL, NEUTRAL, NEUTRAL };
         while (true) {
             int d = kc.getDirection(gs);
             if (d != NEUTRAL) dir = d;
-            gs.next(dir, null);
+            gs.next(dir, ghostDirs);
             gsv.repaint();
             Thread.sleep(20);
         }

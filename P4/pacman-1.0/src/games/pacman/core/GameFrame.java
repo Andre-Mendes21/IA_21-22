@@ -5,7 +5,7 @@ import games.pacman.controllers.KeyController;
 import games.pacman.controllers.PacController;
 import games.pacman.ghost.Ghost;
 import games.pacman.view.DisplayComponent;
-import games.pacman.core.FullGame;
+// import games.pacman.core.FullGame;
 
 /**
  * Created by IntelliJ IDEA.

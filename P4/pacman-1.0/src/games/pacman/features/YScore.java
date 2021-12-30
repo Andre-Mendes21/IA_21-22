@@ -3,8 +3,8 @@ package games.pacman.features;
 import games.pacman.ghost.Ghost;
 import games.pacman.maze.OldMaze;
 import games.pacman.maze.MazeNode;
-import games.pacman.features.NodeEvaluator;
 import games.pacman.core.PacMan;
+// import games.pacman.features.NodeEvaluator;
 
 /**
  * Created by IntelliJ IDEA.

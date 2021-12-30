@@ -1,7 +1,5 @@
 package games.pacman.controllers;
 
-import games.pacman.controllers.PacController;
-
 /**
  * Created by IntelliJ IDEA.
  * User: sml

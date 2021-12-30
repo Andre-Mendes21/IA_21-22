@@ -8,7 +8,7 @@ import games.pacman.ghost.Ghost;
 import games.pacman.view.DisplayComponent;
 import games.pacman.maze.OldMaze;
 import games.pacman.maze.MazeOne;
-import games.pacman.core.PacMan;
+// import games.pacman.core.PacMan;
 
 /**
  * Created by IntelliJ IDEA.

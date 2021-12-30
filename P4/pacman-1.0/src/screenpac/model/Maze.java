@@ -134,8 +134,12 @@ public class Maze implements MazeInterface, Constants {
             // then for each proper direction
             for (int i = 0; i < dx.length; i++) {
                 if (dx[i] != 0 || dy[i] != 0) {
-                    Node adj = getNode(n.x + dx[i], n.y + dy[i]);
-                    if (adj != null) n.adj.add(adj);
+                    Node tmpAdj = getNode(n.x + dx[i], n.y + dy[i]);
+                    if (tmpAdj != null) {
+                        n.adj.add(tmpAdj);
+                        DIR adjDir = DIR.values()[i];
+                        n.allPossibleMoves.put(adjDir, tmpAdj);
+                    } 
                 }
             }
         }

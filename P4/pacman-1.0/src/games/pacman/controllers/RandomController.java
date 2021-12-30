@@ -1,6 +1,5 @@
 package games.pacman.controllers;
 
-import games.pacman.controllers.PacController;
 
 import java.util.Random;
 

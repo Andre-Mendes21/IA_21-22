@@ -3,12 +3,12 @@ package games.pacman.core;
 import utilities.ElapsedTimer;
 import games.pacman.controllers.ConstantController;
 import games.pacman.controllers.SimpleAvoidance;
-import games.pacman.controllers.RandomController;
 import games.pacman.controllers.PacController;
 import games.pacman.ghost.Ghost;
 import games.pacman.maze.OldMaze;
 import games.pacman.maze.MazeOne;
-import games.pacman.core.PacMan;
+// import games.pacman.controllers.RandomController;
+// import games.pacman.core.PacMan;
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,7 +30,7 @@ public class Evaluator {
 
         Evaluator game = new Evaluator();
         ElapsedTimer t = new ElapsedTimer();
-        PacController pc = new RandomController();
+        // PacController pc = new RandomController();
         PacController avoider = new SimpleAvoidance(game.maze, game.ghosts, game.pacman);
         double fitness = game.fitness(avoider);
         System.out.println(t);

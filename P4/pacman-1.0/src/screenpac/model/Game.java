@@ -8,6 +8,7 @@ import utilities.StatSummary;
 import screenpac.extract.Constants;
 import screenpac.controllers.AgentInterface;
 import screenpac.controllers.SimplePillEater;
+import screenpac.controllers.SmartPillEater;
 import screenpac.controllers.RandomAgent;
 import screenpac.controllers.RandomNonReverseAgent;
 import screenpac.ghosts.GhostTeamController;
@@ -21,31 +22,33 @@ public class Game implements Constants {
     // and may also be responsible for taking
     // actions that depend on the game state
     static int delay = 40;
-    static boolean visual = true;
+    static boolean visual = false;
 
     public static void main(String[] args) throws Exception {
-        // AgentInterface agent = new SimplePillEater();
-        AgentInterface agent = new RandomNonReverseAgent();
+        AgentInterface agent;
+        agent = new SimplePillEater();
+        // agent = new RandomNonReverseAgent();
         GhostTeamController ghostTeam;
-        ghostTeam = new RandTeam();
         ghostTeam = new LegacyTeam();
-        ghostTeam = new PincerTeam();
+        // ghostTeam = new PincerTeam();
+        // ghostTeam = new RandTeam();
 
-        agent = null;
-        if (visual) runVisual(agent, ghostTeam);
-        else runDark(agent, ghostTeam);
+        if (visual)
+            runVisual(agent, ghostTeam);
+        else
+            runDark(agent, ghostTeam);
     }
 
-    public static void runDark (AgentInterface agentController, GhostTeamController ghostTeam) throws Exception {
+    public static void runDark(AgentInterface agentController, GhostTeamController ghostTeam) throws Exception {
         Maze maze = new Maze();
         maze.processOldMaze(MazeOne.getMaze());
         GameState gs = new GameState(maze);
         gs.reset();
         Game game = new Game(gs, null, agentController, ghostTeam);
         ElapsedTimer t = new ElapsedTimer();
-        int nRuns = 100;
+        int nRuns = 3;
         StatSummary ss = new StatSummary();
-        for (int i=0; i<nRuns; i++) {
+        for (int i = 0; i < nRuns; i++) {
             game.gs.reset();
             game.run();
             ss.add(game.gs.score);
@@ -60,7 +63,7 @@ public class Game implements Constants {
         gs.nextLevel();
         // gs.nextLevel();
         // gs.nextLevel();
-        gs.nLivesRemaining = 10;
+        gs.nLivesRemaining = 3;
         // gs.reset();
         GameStateView gsv = new GameStateView(gs);
         PlaySound.enable();
@@ -68,7 +71,8 @@ public class Game implements Constants {
         KeyController kc = new KeyController();
         fr.addKeyListener(kc);
         // set the key controller if the agent is null
-        if (agentController == null) agentController = kc;
+        if (agentController == null)
+            agentController = kc;
         Game game = new Game(gs, gsv, agentController, ghostTeam);
         game.frame = fr;
         game.run();
@@ -79,7 +83,7 @@ public class Game implements Constants {
 
     public void run() throws Exception {
         // System.out.println("nLives left: " + gs.nLivesRemaining);
-        while(!gs.terminal()) {
+        while (!gs.terminal()) {
             cycle();
             // System.out.println(gs.pills.cardinality() + " : " + gs.powers.cardinality());
         }
@@ -87,18 +91,19 @@ public class Game implements Constants {
     }
 
     public void run(int n) throws Exception {
-        int i=0;
-        while(i++ < n && !gs.terminal()) {
+        int i = 0;
+        while (i++ < n && !gs.terminal()) {
             cycle();
         }
     }
 
     public void cycle() throws Exception {
         // update the game state
-        gs.next(agentController.action(gs), ghostTeam.getActions(gs));
+        gs.next(this.agentController.action(gs), this.ghostTeam.getActions(gs));
         if (gsv != null) {
             gsv.repaint();
-            if (frame != null) frame.setTitle("Score: " + gs.score);
+            if (frame != null)
+                frame.setTitle("Score: " + gs.score);
             Thread.sleep(delay);
         }
     }

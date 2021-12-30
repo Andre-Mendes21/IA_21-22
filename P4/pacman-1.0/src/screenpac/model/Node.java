@@ -1,9 +1,12 @@
 package screenpac.model;
 
-import java.util.ArrayList;
+import java.util.*;
+
+import screenpac.extract.Constants;
+
 import java.awt.*;
 
-public class Node {
+public class Node implements Constants {
     // nodes carry pill and power pill indices which default to -1
     // meaning that there is neither a pill nor a power pill at this
     // current
@@ -14,12 +17,13 @@ public class Node {
     // in this way the game state can be cleanly separated from the
     // maze layout
 
-    public int x,y;
+    public int x, y;
     public int nodeIndex;
 
     public int pillIndex;
     public int powerIndex;
     public ArrayList<Node> adj;
+    public Map<DIR, Node> allPossibleMoves = new HashMap<>();
 
     public Node(int x, int y) {
         this.x = x;
@@ -29,10 +33,25 @@ public class Node {
         powerIndex = -1;
     }
 
+    public ArrayList<Node> getAdjacentNodes() {
+        return this.adj;
+    }
+
     public String toString() {
         return x + " \t " + y;
     }
 
+    public int[] getAllPossibleMoves() {
+        int[] possibleMoves = new int[allPossibleMoves.size()];
+        DIR[] dirs = DIR.values();
+
+        for(int i = 0; i < dx.length; i++) {
+            if(allPossibleMoves.containsKey(dirs[i])) {
+                possibleMoves[i] = dirs[i].ordinal();
+            }
+        }
+        return possibleMoves;
+    }
     // colour should not really be defined here
     // it was a hack to enable display of various
     // node properties

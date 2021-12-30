@@ -32,7 +32,8 @@ public class Agent implements Constants {
             curDir = dir;
         } else {
             next = maze.getNode(current.x + dx[curDir], current.y + dy[curDir]);
-            if (next != null) current = next;
+            if (next != null) 
+                current = next;
         }
         return current;
     }

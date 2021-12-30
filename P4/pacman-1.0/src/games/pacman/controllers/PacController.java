@@ -1,7 +1,5 @@
 package games.pacman.controllers;
 
-import games.pacman.core.GameModel;
-import games.math.Vector2d;
 
 /**
  * Created by IntelliJ IDEA.

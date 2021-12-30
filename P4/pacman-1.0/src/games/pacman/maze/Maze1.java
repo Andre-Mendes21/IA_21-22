@@ -5,7 +5,7 @@ import utilities.JEasyFrame;
 import java.util.ArrayList;
 
 import games.pacman.view.DisplayComponent;
-import games.pacman.maze.Line;
+import games.pacman.view.Drawable;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,7 +25,7 @@ public class Maze1 {
 
     }
 
-    static ArrayList maze = new ArrayList();
+    static ArrayList<Drawable> maze = new ArrayList<>();
 
     static {
 

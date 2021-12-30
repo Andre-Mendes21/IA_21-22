@@ -1,7 +1,5 @@
 package games.pacman.controllers;
 
-import games.pacman.controllers.PacController;
-
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
