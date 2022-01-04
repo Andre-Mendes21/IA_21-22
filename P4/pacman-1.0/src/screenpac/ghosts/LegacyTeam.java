@@ -24,7 +24,7 @@ public class LegacyTeam implements GhostTeamController, Constants {
     public LegacyTeam() {
         this.dirs = new int[nGhosts];
         options = new ArrayList<Node>();
-        scorers = new NodeScore[]{
+        scorers = new NodeScore[] {
                 new PathScore(), new EuclideanScore(),
                 new ManhattanScore(), new RandScore(),
         };
@@ -32,12 +32,13 @@ public class LegacyTeam implements GhostTeamController, Constants {
 
     public int[] getActions(GameStateInterface gs) {
         // each score function dictates where each ghost should move
-        for (int i=0; i<dirs.length; i++) {
+        for (int i = 0; i < dirs.length; i++) {
             GhostState gh = gs.getGhosts()[i];
             options.clear();
             for (Node n : gh.current.adj) {
                 // turning back is not a valid option
-                if (!n.equals(gh.previous)) options.add(n);
+                if (!n.equals(gh.previous))
+                    options.add(n);
             }
             dirs[i] = Utilities.getMinDir(options, gh.current, scorers[i], gs);
         }
