@@ -30,38 +30,44 @@ public interface Constants {
     int[] dy = {-1, 0, 1, 0, 0};
 
     public enum DIR {
-        UP {
+        UP (0) {
             public DIR opposite() {
                 return DIR.DOWN;
             }
 
         ;},
-        RIGHT {
+        RIGHT (1) {
             public DIR opposite() {
                 return DIR.LEFT;
             }
 
         ;},
-        DOWN {
+        DOWN (2) {
             public DIR opposite() {
                 return DIR.UP;
             }
 
         ;},
-        LEFT {
+        LEFT (3) {
             public DIR opposite() {
                 return DIR.RIGHT;
             }
 
         ;},
-        NEUTRAL {
+        NEUTRAL (4) {
             public DIR opposite() {
                 return DIR.NEUTRAL;
             }
 
         ;};
 
+        private final int dir;
+
         public abstract DIR opposite();
+
+        private DIR(int dir) {
+            this.dir = dir;
+        }
     }
     // this is how long each ghost is delayed at the start of a level
     // or when a Pac-Man loses a life
