@@ -24,8 +24,16 @@ public class GameState implements GameStateInterface, Constants {
         return pills;
     }
 
+    public int getNumberActivePills() {
+        return pills.cardinality();
+    }
+
     public BitSet getPowers() {
         return powers;
+    }
+
+    public int getNumberActivePowerPills() {
+        return powers.cardinality();
     }
 
     public GhostState[] getGhosts() {
@@ -58,6 +66,7 @@ public class GameState implements GameStateInterface, Constants {
     public int edibleGhostScore;
     int gameTick;
     public int nLivesRemaining;
+    public boolean powerPillWasEaten;
 
     public GameStateInterface copy() {
         // return a deep copy of the current game state
@@ -75,6 +84,7 @@ public class GameState implements GameStateInterface, Constants {
         gs.edibleGhostScore = edibleGhostScore;
         gs.gameTick = gameTick;
         gs.nLivesRemaining = nLivesRemaining;
+        gs.powerPillWasEaten = powerPillWasEaten;
         return gs;
     }
 
@@ -87,6 +97,7 @@ public class GameState implements GameStateInterface, Constants {
         ghosts = new GhostState[nGhosts];
         pills = new BitSet(maze.getPills().size());
         powers = new BitSet(maze.getPowers().size());
+        powerPillWasEaten = false;
         reset();
     }
 
@@ -179,6 +190,7 @@ public class GameState implements GameStateInterface, Constants {
     }
 
     public void tryEatPower() {
+        powerPillWasEaten = false;
         int ix = pacMan.current.powerIndex;
         if (ix >= 0) {
             if (powers.get(ix)) {
@@ -188,8 +200,13 @@ public class GameState implements GameStateInterface, Constants {
                 setEdible();
                 score += powerScore;
                 PlaySound.eatPower();
+                powerPillWasEaten = true;
             }
         }
+    }
+
+    public boolean wasPowerEaten() {
+        return powerPillWasEaten;
     }
 
     public void setEdible() {
@@ -209,6 +226,16 @@ public class GameState implements GameStateInterface, Constants {
     }
 
     public boolean agentDeath() {
+        for (GhostState g : ghosts) {
+            if (!g.edible() && !g.returning() && overlap(g, pacMan)) {
+                PlaySound.loseLife();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean agentDeathSilent() {
         for (GhostState g : ghosts) {
             if (!g.edible() && !g.returning() && overlap(g, pacMan)) {
                 PlaySound.loseLife();

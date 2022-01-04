@@ -41,13 +41,13 @@ public class Node implements Constants {
         return x + " \t " + y;
     }
 
-    public int[] getAllPossibleMoves() {
-        int[] possibleMoves = new int[allPossibleMoves.size()];
+    public DIR[] getAllPossibleMoves() {
+        DIR[] possibleMoves = new DIR[allPossibleMoves.size()];
         DIR[] dirs = DIR.values();
 
         for(int i = 0; i < dx.length; i++) {
             if(allPossibleMoves.containsKey(dirs[i])) {
-                possibleMoves[i] = dirs[i].ordinal();
+                possibleMoves[i] = dirs[i];
             }
         }
         return possibleMoves;
