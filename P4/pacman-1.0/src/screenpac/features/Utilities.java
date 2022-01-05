@@ -123,7 +123,7 @@ public class Utilities implements Constants {
             currentPacmanDir = getPacmanMoveAlongPath(gameState, dir);
 
             hadEdibleGhost = hasEdibleGhost(gameState);
-            gameState.next(currentPacmanDir.getDir(), ghostController.getActions(gameState));
+            gameState.next(currentPacmanDir.ordinal(), ghostController.getActions(gameState));
 
             --result.steps;
             --maxSteps;

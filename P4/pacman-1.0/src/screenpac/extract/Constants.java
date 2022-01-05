@@ -64,9 +64,6 @@ public interface Constants {
         private final int dir;
 
         public abstract DIR opposite();
-        public int getDir() {
-            return dir;
-        }
 
         private DIR(int dir) {
             this.dir = dir;
