@@ -15,11 +15,11 @@ public class MCTNode implements Constants {
 	private double reward;
 
 	private ArrayList<MCTNode> children;
-	private GameStateInterface gameState;
+	GameStateInterface gameState;
 
 	private boolean canUpdate;
 
-	private int pathLengthInSteps;
+	int pathLengthInSteps;
 
 	/**
 	 * Default Constructor
@@ -60,6 +60,7 @@ public class MCTNode implements Constants {
 	}
 
 	public boolean isFullyExpanded() {
+		// FIXME: Change 140 magic number to Tree_Depth constant
 		return getPacmanMovesNotExpanded(140).isEmpty();
 	}
 
