@@ -52,7 +52,7 @@ public class MCTS implements Constants {
         long lastDeltaMillis = TimeUnit.MILLISECONDS.convert(lastDeltaNS, TimeUnit.NANOSECONDS);
         long returnTimeMS = 2;
         if(System.currentTimeMillis() + lastDeltaMillis + returnTimeMS > timeDue)
-        return true;
+            return true;
         return false;
     }
     
