@@ -3,8 +3,8 @@ package screenpac.controllers.MCTS;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import screenpac.controllers.MCTS.Utils.DIR;
 import screenpac.extract.Constants;
-import screenpac.features.Utilities;
 import screenpac.ghosts.GhostTeamController;
 import screenpac.model.GameStateInterface;
 
@@ -21,7 +21,7 @@ public class MCTS implements Constants {
         this.rootNode = new MCTNode(gameState.copy(), 0);
         this.ghostsController = ghostsController;
 
-        this.numOfActivePillsStart = gameState.getNumberActivePills();
+        this.numOfActivePillsStart = Utils.getNumberActivePills(gameState);
         this.timeDue = timeDue;
     }
 
@@ -78,7 +78,7 @@ public class MCTS implements Constants {
         assert !pacmanMoves.isEmpty();
         DIR pacmanDir = pacmanMoves.get(random.nextInt(pacmanMoves.size()));
     
-        SimResult result = Utilities.simulateUntilNextJunction(parentNode.gameState.copy(), ghostsController, pacmanDir);
+        SimResult result = Utils.simulateUntilNextJunction(parentNode.gameState.copy(), ghostsController, pacmanDir);
     
         MCTNode child = new MCTNode(result.gameState, parentNode.pathLengthInSteps + result.steps);
     
@@ -87,7 +87,7 @@ public class MCTS implements Constants {
     
         parentNode.getChildren().add(child);
     
-        if(result.didedDuringSim || result.powerPillUnncessarilyEaten) {
+        if(result.didedDuringSim || result.powerPillUnnecessarilyEaten) {
             child.updateReward(-1);
             child.setCanUpdate(false);
     
@@ -105,11 +105,11 @@ public class MCTS implements Constants {
         int remainingSteps = totalSteps;
         SimResult lastSimResult = new SimResult();
 
-        while(!Utilities.analyzeGameState(simGameState, lastSimResult, remainingSteps, lastSimResult.powerPillUnncessarilyEaten)) {
-            ArrayList<DIR> availableMoves = Utilities.getPacmanMovesAtJunctionWithoutReverse(simGameState);
+        while(!Utils.analyzeGameState(simGameState, lastSimResult, remainingSteps, lastSimResult.powerPillUnnecessarilyEaten)) {
+            ArrayList<DIR> availableMoves = Utils.getPacmanMovesAtJunctionWithoutReverse(simGameState);
             DIR pacmanDir = availableMoves.get(random.nextInt(availableMoves.size()));
 
-            lastSimResult = Utilities.simulateToNextJunctionOrLimit(simGameState, ghostsController, pacmanDir, remainingSteps);
+            lastSimResult = Utils.simulateToNextJunctionOrLimit(simGameState, ghostsController, pacmanDir, remainingSteps);
 
             remainingSteps -= lastSimResult.steps;
         }
@@ -118,15 +118,15 @@ public class MCTS implements Constants {
             return 1;
         }
 
-        if(lastSimResult.didedDuringSim || lastSimResult.powerPillUnncessarilyEaten) {
+        if(lastSimResult.didedDuringSim || lastSimResult.powerPillUnnecessarilyEaten) {
             return 0;
         }
 
-        if(simGameState.getNumberActivePills() == numOfActivePillsStart) {
+        if(Utils.getNumberActivePills(simGameState) == numOfActivePillsStart) {
             return 0.1d * (1.d / numOfActivePillsStart);
         }
 
-        return 1.0d - (simGameState.getNumberActivePills() / (double) numOfActivePillsStart);
+        return 1.0d - (Utils.getNumberActivePills(simGameState) / (double) numOfActivePillsStart);
     }
 
     private void backpropagate(MCTNode selectedNode, double reward) {

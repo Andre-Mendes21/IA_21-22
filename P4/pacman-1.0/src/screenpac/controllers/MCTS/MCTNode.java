@@ -3,9 +3,9 @@ package screenpac.controllers.MCTS;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import screenpac.controllers.MCTS.Utils.DIR;
 import screenpac.extract.Constants;
 import screenpac.model.GameStateInterface;
-import screenpac.features.Utilities;
 
 public class MCTNode implements Constants {
 	MCTNode parent;
@@ -65,7 +65,7 @@ public class MCTNode implements Constants {
 	}
 
 	public ArrayList<DIR> getPacmanMovesWithoutReverse() {
-		ArrayList<DIR> moves = Utilities.getPacmanMovesWithoutNeutral(this.gameState);
+		ArrayList<DIR> moves = Utils.getPacmanMovesWithoutNeutral(this.gameState);
 
 		if(this.parent != null) {
 			moves.remove(parentAction.opposite());
@@ -111,7 +111,7 @@ public class MCTNode implements Constants {
 	}
 
 	public boolean isGameOver() {
-		return gameState.agentDeathSilent() || gameState.getNumberActivePills() == 0;
+		return Utils.agentDeathSilent(gameState) || Utils.getNumberActivePills(gameState) == 0;
 	}
 
 	public void updateReward(double deltaReward) {
