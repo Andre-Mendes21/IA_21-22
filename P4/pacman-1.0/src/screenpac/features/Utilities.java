@@ -189,4 +189,11 @@ public class Utilities implements Constants {
         }
         return false;
     }
+
+    public static ArrayList<DIR> getPacmanMovesAtJunctionWithoutReverse(GameStateInterface gameState) {
+        ArrayList<DIR> moves = getPacmanMovesWithoutNeutral(gameState);
+        moves.remove(gameState.getPacman().getPacmanLastMoveMade().opposite());
+
+        return moves;
+    }
 }
