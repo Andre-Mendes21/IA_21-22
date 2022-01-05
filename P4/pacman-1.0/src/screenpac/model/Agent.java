@@ -41,8 +41,4 @@ public class Agent implements Constants {
         }
         return current;
     }
-
-    public DIR getPacmanLastMoveMade() {
-        return DIR.values()[lastDir];
-    }
 }

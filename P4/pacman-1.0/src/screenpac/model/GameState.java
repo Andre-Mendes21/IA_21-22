@@ -24,16 +24,8 @@ public class GameState implements GameStateInterface, Constants {
         return pills;
     }
 
-    public int getNumberActivePills() {
-        return pills.cardinality();
-    }
-
     public BitSet getPowers() {
         return powers;
-    }
-
-    public int getNumberActivePowerPills() {
-        return powers.cardinality();
     }
 
     public GhostState[] getGhosts() {
@@ -190,7 +182,6 @@ public class GameState implements GameStateInterface, Constants {
     }
 
     public void tryEatPower() {
-        powerPillWasEaten = false;
         int ix = pacMan.current.powerIndex;
         if (ix >= 0) {
             if (powers.get(ix)) {
@@ -200,13 +191,8 @@ public class GameState implements GameStateInterface, Constants {
                 setEdible();
                 score += powerScore;
                 PlaySound.eatPower();
-                powerPillWasEaten = true;
             }
         }
-    }
-
-    public boolean wasPowerEaten() {
-        return powerPillWasEaten;
     }
 
     public void setEdible() {
@@ -226,16 +212,6 @@ public class GameState implements GameStateInterface, Constants {
     }
 
     public boolean agentDeath() {
-        for (GhostState g : ghosts) {
-            if (!g.edible() && !g.returning() && overlap(g, pacMan)) {
-                PlaySound.loseLife();
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean agentDeathSilent() {
         for (GhostState g : ghosts) {
             if (!g.edible() && !g.returning() && overlap(g, pacMan)) {
                 PlaySound.loseLife();

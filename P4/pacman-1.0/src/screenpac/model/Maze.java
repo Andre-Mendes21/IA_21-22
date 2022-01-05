@@ -137,8 +137,6 @@ public class Maze implements MazeInterface, Constants {
                     Node tmpAdj = getNode(n.x + dx[i], n.y + dy[i]);
                     if (tmpAdj != null) {
                         n.adj.add(tmpAdj);
-                        DIR adjDir = DIR.values()[i];
-                        n.allPossibleMoves.put(adjDir, tmpAdj);
                     } 
                 }
             }

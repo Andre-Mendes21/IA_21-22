@@ -23,7 +23,6 @@ public class Node implements Constants {
     public int pillIndex;
     public int powerIndex;
     public ArrayList<Node> adj;
-    public Map<DIR, Node> allPossibleMoves = new HashMap<>();
 
     public Node(int x, int y) {
         this.x = x;
@@ -41,17 +40,6 @@ public class Node implements Constants {
         return x + " \t " + y;
     }
 
-    public DIR[] getAllPossibleMoves() {
-        DIR[] possibleMoves = new DIR[allPossibleMoves.size()];
-        DIR[] dirs = DIR.values();
-
-        for(int i = 0; i < dx.length; i++) {
-            if(allPossibleMoves.containsKey(dirs[i])) {
-                possibleMoves[i] = dirs[i];
-            }
-        }
-        return possibleMoves;
-    }
     // colour should not really be defined here
     // it was a hack to enable display of various
     // node properties

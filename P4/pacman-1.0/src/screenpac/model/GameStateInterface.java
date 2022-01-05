@@ -9,17 +9,13 @@ public interface GameStateInterface {
     MazeInterface getMaze();
     int getLevel(); // the maze should be recoverable from this
     BitSet getPills();
-    int getNumberActivePills();
-    int getNumberActivePowerPills();
     BitSet getPowers();
     GhostState[] getGhosts();
     int getScore();
     int getGameTick();
     int getEdibleGhostScore();
-    boolean wasPowerEaten();
     int getLivesRemaining();
     boolean agentDeath();
-    boolean agentDeathSilent();
     boolean terminal();
     void reset();
 }
