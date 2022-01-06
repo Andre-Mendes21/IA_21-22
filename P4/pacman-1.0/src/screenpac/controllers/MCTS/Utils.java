@@ -130,9 +130,9 @@ public class Utils implements Constants {
 			currentPacmanDir = getPacmanMoveAlongPath(gameState, dir);
 
 			hadEdibleGhost = hasEdibleGhost(gameState);
-			gameState.next(currentPacmanDir.getDir(), ghostController.getActions(gameState));
+			gameState.next(currentPacmanDir.ordinal(), ghostController.getActions(gameState));
 
-			--result.steps;
+			++result.steps;
 			--maxSteps;
 		} while(!analyzeGameState(gameState, result, maxSteps, hadEdibleGhost) && !isJunction(gameState.getPacman().current));
 
@@ -150,7 +150,7 @@ public class Utils implements Constants {
 		}
 
 		if(agentDeathSilent(gameState)) {
-			result.didedDuringSim = true;
+			result.diedDuringSim = true;
 			shouldStop = true;
 		}
 
@@ -165,7 +165,7 @@ public class Utils implements Constants {
 		return shouldStop;
 	}
 
-	// FIXME: May not work as intended, needs to find shortest distance to ghost Manhatten distance may not be suited
+	// FIXME: May not work as intended, needs to find shortest distance to ghost, Manhatten distance may not be suited
 	public static boolean wasAGhostClose(GameStateInterface gameState) {
 		Node pacmanNode = gameState.getPacman().current;
 		
