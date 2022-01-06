@@ -51,7 +51,7 @@ public class MCTS implements Constants {
     private boolean terminate(long lastDeltaNS) {
         long lastDeltaMillis = TimeUnit.MILLISECONDS.convert(lastDeltaNS, TimeUnit.NANOSECONDS);
         long returnTimeMS = 2;
-        if(System.currentTimeMillis() + lastDeltaMillis + returnTimeMS > timeDue)
+        if(lastDeltaMillis + returnTimeMS > timeDue)
             return true;
         return false;
     }
@@ -81,13 +81,13 @@ public class MCTS implements Constants {
         SimResult result = Utils.simulateUntilNextJunction(parentNode.gameState.copy(), ghostsController, pacmanDir);
     
         MCTNode child = new MCTNode(result.gameState, parentNode.pathLengthInSteps + result.steps);
-    
+        
         child.parentAction = pacmanDir;
-        child.parent.parent = parentNode;
+        child.parent = parentNode;
     
         parentNode.getChildren().add(child);
     
-        if(result.didedDuringSim || result.powerPillUnnecessarilyEaten) {
+        if(result.diedDuringSim || result.powerPillUnnecessarilyEaten) {
             child.updateReward(-1);
             child.setCanUpdate(false);
     
@@ -118,7 +118,7 @@ public class MCTS implements Constants {
             return 1;
         }
 
-        if(lastSimResult.didedDuringSim || lastSimResult.powerPillUnnecessarilyEaten) {
+        if(lastSimResult.diedDuringSim || lastSimResult.powerPillUnnecessarilyEaten) {
             return 0;
         }
 

@@ -6,7 +6,7 @@ public class SimResult {
     public int steps = 0;
     public GameStateInterface gameState;
 
-    public boolean didedDuringSim = false;
+    public boolean diedDuringSim = false;
     public boolean levelComplete = false;
     public boolean powerPillUnnecessarilyEaten = false;
 }

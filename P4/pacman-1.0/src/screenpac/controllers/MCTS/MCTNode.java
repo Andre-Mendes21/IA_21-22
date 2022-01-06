@@ -24,6 +24,7 @@ public class MCTNode implements Constants {
 	/**
 	 * Default Constructor
 	 * @param game	 The copied game state
+	 * @param pathLengthInSteps 
 	 */
 	public MCTNode(GameStateInterface game, int pathLengthInSteps) {
 		this.parent = null;

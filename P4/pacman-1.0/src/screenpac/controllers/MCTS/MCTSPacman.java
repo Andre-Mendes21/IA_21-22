@@ -20,7 +20,6 @@ public class MCTSPacman implements AgentInterface, Constants{
     public int action(GameStateInterface gs) {
         MCTS mcts = new MCTS(gs, this.ghostsController, timeDue);
         DIR nextDir = mcts.runMCTS();
-        System.out.println(nextDir.ordinal());
 
         if(nextDir != null) {
             myDir = nextDir;
