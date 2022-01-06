@@ -9,6 +9,7 @@ import screenpac.extract.Constants;
 import screenpac.controllers.AgentInterface;
 import screenpac.controllers.SimplePillEater;
 import screenpac.controllers.SmartPillEater;
+import screenpac.controllers.MCTS.MCTSPacman;
 import screenpac.controllers.RandomAgent;
 import screenpac.controllers.RandomNonReverseAgent;
 import screenpac.ghosts.GhostTeamController;
@@ -22,16 +23,18 @@ public class Game implements Constants {
     // and may also be responsible for taking
     // actions that depend on the game state
     static int delay = 40;
-    static boolean visual = false;
+    static boolean visual = true;
 
     public static void main(String[] args) throws Exception {
-        AgentInterface agent;
-        agent = new SimplePillEater();
-        // agent = new RandomNonReverseAgent();
         GhostTeamController ghostTeam;
         ghostTeam = new LegacyTeam();
         // ghostTeam = new PincerTeam();
         // ghostTeam = new RandTeam();
+
+        AgentInterface agent;
+        agent = new MCTSPacman(ghostTeam, 40);
+        // agent = new SimplePillEater();
+        // agent = new RandomNonReverseAgent();
 
         if (visual)
             runVisual(agent, ghostTeam);

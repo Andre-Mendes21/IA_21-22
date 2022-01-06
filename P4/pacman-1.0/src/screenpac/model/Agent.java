@@ -1,5 +1,6 @@
 package screenpac.model;
 
+import screenpac.controllers.MCTS.Utils.DIR;
 import screenpac.extract.Constants;
 
 public class Agent implements Constants {
@@ -40,5 +41,9 @@ public class Agent implements Constants {
                 current = next;
         }
         return current;
+    }
+
+    public DIR getPacmanLastMoveMade() {
+        return DIR.values()[lastDir];
     }
 }
