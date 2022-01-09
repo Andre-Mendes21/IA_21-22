@@ -6,6 +6,7 @@ import utilities.JEasyFrame;
 import utilities.ElapsedTimer;
 import utilities.StatSummary;
 import screenpac.extract.Constants;
+import screenpac.features.Utilities;
 import screenpac.controllers.AgentInterface;
 import screenpac.controllers.SimplePillEater;
 import screenpac.controllers.SmartPillEater;
@@ -32,7 +33,8 @@ public class Game implements Constants {
         // ghostTeam = new RandTeam();
 
         AgentInterface agent;
-        agent = new MCTSPacman(ghostTeam, 40);
+        // agent = null;
+        agent = new MCTSPacman(ghostTeam, delay);
         // agent = new SimplePillEater();
         // agent = new RandomNonReverseAgent();
 
@@ -66,7 +68,7 @@ public class Game implements Constants {
         gs.nextLevel();
         // gs.nextLevel();
         // gs.nextLevel();
-        gs.nLivesRemaining = 3;
+        gs.nLivesRemaining = Utilities.nLives;
         // gs.reset();
         GameStateView gsv = new GameStateView(gs);
         PlaySound.enable();
@@ -101,7 +103,7 @@ public class Game implements Constants {
     }
 
     public void cycle() throws Exception {
-        // update the game state
+        // update the game state        
         gs.next(this.agentController.action(gs), this.ghostTeam.getActions(gs));
         if (gsv != null) {
             gsv.repaint();

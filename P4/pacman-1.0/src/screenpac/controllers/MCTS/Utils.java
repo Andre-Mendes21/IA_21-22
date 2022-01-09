@@ -1,19 +1,22 @@
 package screenpac.controllers.MCTS;
 
-import java.util.ArrayDeque;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.stream.Stream;
 
+import screenpac.controllers.PathPlanner;
 import screenpac.extract.Constants;
 import screenpac.ghosts.GhostTeamController;
 import screenpac.model.GameState;
 import screenpac.model.GameStateInterface;
 import screenpac.model.GhostState;
 import screenpac.model.Node;
+import screenpac.features.NearestPillDistance;
 import screenpac.features.Utilities;
 
 public class Utils implements Constants {
+
+	final static int TREE_DEPTH = 140;
 
 	public enum DIR {
 		UP (0) {
@@ -115,33 +118,40 @@ public class Utils implements Constants {
 		return node.adj.size() > 2;
 	}
 
-	public static SimResult simulateUntilNextJunction(GameStateInterface gameState, GhostTeamController ghostController, DIR dir) {
-		SimResult result = simulateToNextJunctionOrLimit(gameState, ghostController, dir, Integer.MAX_VALUE);
+	public static SimResult simulateUntilNextJunction(GameStateInterface gameState, GhostTeamController ghostController, DIR dir, Node gamePreferredNode) {
+		SimResult result = simulateToNextJunctionOrLimit(gameState, ghostController, dir, TREE_DEPTH, gamePreferredNode);
 
 		return result;
 	}
 
-	public static SimResult simulateToNextJunctionOrLimit(GameStateInterface gameState, GhostTeamController ghostController, DIR dir, int maxSteps) {
+	public static SimResult simulateToNextJunctionOrLimit(GameStateInterface gameState, GhostTeamController ghostController, DIR dir, int maxSteps, Node gamePreferredNode) {
 		SimResult result = new SimResult();
+		PathPlanner pathPlanner = new PathPlanner(gameState.getMaze());
 
-		DIR currentPacmanDir = dir;
+		DIR pacmanNextDir = dir;
 		boolean hadEdibleGhost;
+		
 		do {
-			currentPacmanDir = getPacmanMoveAlongPath(gameState, dir);
+			Node currentPacmanNode = gameState.getPacman().current; 
+			Node nextNode = pathPlanner.getPath(currentPacmanNode, gamePreferredNode).remove(0);
+			int nextDir = Utilities.getDirection(currentPacmanNode, nextNode);
+
+			pacmanNextDir = DIR.values()[nextDir];
+			// pacmanNextDir = getPacmanMoveAlongPath(gameState, pacmanNextDir);
 
 			hadEdibleGhost = hasEdibleGhost(gameState);
-			gameState.next(currentPacmanDir.ordinal(), ghostController.getActions(gameState));
+			gameState.next(pacmanNextDir.ordinal(), ghostController.getActions(gameState));
 
 			++result.steps;
 			--maxSteps;
-		} while(!analyzeGameState(gameState, result, maxSteps, hadEdibleGhost) && !isJunction(gameState.getPacman().current));
+		} while(!analyzeGameState(gameState, result, maxSteps, hadEdibleGhost, gamePreferredNode));
 
 		result.gameState = gameState;
 
 		return result;
 	}
 
-	public static boolean analyzeGameState(GameStateInterface gameState, SimResult result, int remainingSteps, boolean hadEdibleGhost) {
+	public static boolean analyzeGameState(GameStateInterface gameState, SimResult result, int remainingSteps, boolean hadEdibleGhost, Node gamePreferredNode) {
 		boolean shouldStop = false;
 
 		if(isPillsCleared(gameState)) {
@@ -159,6 +169,11 @@ public class Utils implements Constants {
 			shouldStop = true;
 		}
 
+		if(gameState.getPacman().current.equals(gamePreferredNode)) {
+			result.gamePreferredNodeHit = true;
+			shouldStop = true;
+		}
+		
 		if(remainingSteps <= 0) {
 			shouldStop = true;
 		}
@@ -171,16 +186,14 @@ public class Utils implements Constants {
 		
 		for(GhostState ghost : gameState.getGhosts()) {
 			Node ghostNode = ghost.current;
-			if(Utilities.manhattan(pacmanNode, ghostNode) < 20) {
+			if(Utilities.manhattan(pacmanNode, ghostNode) <= 20) {
 				return true;
 			}
 		}
-
 		return false;
 	}
 
 
-	// FIXME: Find a way to get pacman's last made move
 	public static DIR getPacmanMoveAlongPath(GameStateInterface gameState, DIR dir) {
 		ArrayList<DIR> moves = getPacmanMovesWithoutNeutral(gameState);
 		if(moves.contains(dir)) {
@@ -200,11 +213,72 @@ public class Utils implements Constants {
 		return false;
 	}
 
-	// FIXME: Find a way to get pacman's last made move
 	public static ArrayList<DIR> getPacmanMovesAtJunctionWithoutReverse(GameStateInterface gameState) {
 		ArrayList<DIR> moves = getPacmanMovesWithoutNeutral(gameState);
 		moves.remove(gameState.getPacman().getPacmanLastMoveMade().opposite());
 
 		return moves;
 	}
+
+	//======================================================================================================//
+	
+	public static Node gamePreferredNode(GameStateInterface gameState) {
+		Node nearestGhostNode = Utils.nearestEdibleGhost(gameState);
+		if(nearestGhostNode != null) {
+			return nearestGhostNode;
+		}
+
+		return Utils.nearestPill(gameState);
+	}
+
+	public static Node nearestEdibleGhost(GameStateInterface gameState) {
+		Node pacmanNode = gameState.getPacman().current;
+		int G = 20;
+		
+		for(GhostState ghost : gameState.getGhosts()) {
+			Node ghostNode = ghost.current;
+			if(ghost.edible() && Utilities.manhattan(pacmanNode, ghostNode) < G) {
+				ghostNode.col = Color.CYAN;
+				return ghostNode;
+			}
+		}
+		return null;
+	}
+
+	public static Node nearestPill(GameStateInterface gameState) {
+		double P = ((double) TREE_DEPTH / 5d) - 1d;
+		NearestPillDistance npd = new NearestPillDistance();
+		Node pacmanNode = gameState.getPacman().current;
+
+		for(GhostState ghost : gameState.getGhosts()) {
+			if(!ghost.edible() && npd.score(gameState, pacmanNode) < P) {
+				return npd.closest;
+			}
+		}
+		return Utilities.getClosest(pacmanNode.adj, npd.closest, gameState.getMaze());
+	}
+
+	public static DIR checkNearGhosts(GameStateInterface gameState) {
+        DIR move = DIR.NEUTRAL;
+        double maxDistance = Integer.MIN_VALUE;
+		Node pacmanNode = gameState.getPacman().current;
+		int G = 20;
+			
+		for(GhostState ghost : gameState.getGhosts()) {
+			Node ghostNode = ghost.current;
+			if(!ghost.edible() && Utilities.manhattan(pacmanNode, ghostNode) <= G) {
+				for (Node a : pacmanNode.adj) {
+					double distance = Utilities.manhattan(a, ghostNode);
+					
+					if (distance > maxDistance) {
+						maxDistance = distance;
+						move = DIR.values()[Utilities.getDirection(a, ghostNode)].opposite();
+					}
+				}
+				return move;
+			}
+		}
+			
+		return DIR.NEUTRAL;
+    }
 }

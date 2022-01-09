@@ -9,4 +9,5 @@ public class SimResult {
     public boolean diedDuringSim = false;
     public boolean levelComplete = false;
     public boolean powerPillUnnecessarilyEaten = false;
+    public boolean gamePreferredNodeHit = false;
 }

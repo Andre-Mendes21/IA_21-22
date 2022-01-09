@@ -6,10 +6,12 @@ import java.util.stream.Collectors;
 import screenpac.controllers.MCTS.Utils.DIR;
 import screenpac.extract.Constants;
 import screenpac.model.GameStateInterface;
+import screenpac.model.Node;
 
 public class MCTNode implements Constants {
 	MCTNode parent;
-	DIR parentAction;
+	DIR nextDir;
+	Node targetNode;
 
 	private int numOfVisits;
 	private double reward;
@@ -28,7 +30,7 @@ public class MCTNode implements Constants {
 	 */
 	public MCTNode(GameStateInterface game, int pathLengthInSteps) {
 		this.parent = null;
-		this.parentAction = null;
+		this.nextDir = null;
 
 		this.numOfVisits = 0;
 		this.reward = 0;
@@ -56,33 +58,32 @@ public class MCTNode implements Constants {
 		double exploitSqr = exploit * exploit;
 		double explor = Math.sqrt( (Math.log(parent.numOfVisits) / this.numOfVisits) 
 										* Math.min(0.25, rewardSqrExploit - exploitSqr 
-										+ Math.sqrt((2d * Math.log(parent.numOfVisits) / numOfVisits))) );
+										+ Math.sqrt(((2d * Math.log(parent.numOfVisits)) / numOfVisits))) );
 		return exploit + explor;
 	}
 
 	public boolean isFullyExpanded() {
-		// FIXME: Change 140 magic number to Tree_Depth constant
-		return getPacmanMovesNotExpanded(140).isEmpty();
+		return getPacmanMovesNotExpanded(Utils.TREE_DEPTH).isEmpty();
 	}
 
 	public ArrayList<DIR> getPacmanMovesWithoutReverse() {
 		ArrayList<DIR> moves = Utils.getPacmanMovesWithoutNeutral(this.gameState);
 
 		if(this.parent != null) {
-			moves.remove(parentAction.opposite());
+			moves.remove(nextDir.opposite());
 		} 
 
 		return moves;
 	}
 
 	public ArrayList<DIR> getPacmanMovesNotExpanded(final int MAX_PATH_LENGTH) {
-		if(this.pathLengthInSteps > 0.8f * MAX_PATH_LENGTH) {
+		if(this.pathLengthInSteps > 0.8d * MAX_PATH_LENGTH) {
 			return new ArrayList<>();
 		}
 		else {
 			ArrayList<DIR> moves = this.getPacmanMovesWithoutReverse();
 
-			moves.removeAll(children.parallelStream().map(child -> child.parentAction).collect(Collectors.toList()));
+			moves.removeAll(children.parallelStream().map(child -> child.nextDir).collect(Collectors.toList()));
 
 			return moves;
 		}
@@ -139,7 +140,7 @@ public class MCTNode implements Constants {
         while (!pathStack.empty()) {
             MCTNode node = pathStack.pop();
             sb.append('/');
-            sb.append(node.parentAction);
+            sb.append(node.nextDir);
         }
 
         return sb.toString();
@@ -165,7 +166,7 @@ public class MCTNode implements Constants {
         sb.append(path() + " distance: " + pathLengthInSteps);
         sb.append(" - Children ");
         for(MCTNode child : children) {
-            sb.append(" || [" + child.parentAction + "] ");
+            sb.append(" || [" + child.nextDir + "] ");
             sb.append("r/s: " + child.reward + "/" + child.numOfVisits);
         }
 

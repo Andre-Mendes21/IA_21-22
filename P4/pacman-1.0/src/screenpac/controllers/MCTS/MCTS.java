@@ -7,6 +7,7 @@ import screenpac.controllers.MCTS.Utils.DIR;
 import screenpac.extract.Constants;
 import screenpac.ghosts.GhostTeamController;
 import screenpac.model.GameStateInterface;
+import screenpac.model.Node;
 
 public class MCTS implements Constants {
 
@@ -26,34 +27,22 @@ public class MCTS implements Constants {
     }
 
     public DIR runMCTS() {
-        long deltaTimeNS = 0;
-        Long lastNS = System.nanoTime();
+        Long timeStamp = System.currentTimeMillis();
 
-        while(!terminate(deltaTimeNS)) {
+        while(System.currentTimeMillis() <= timeStamp + timeDue + 2) {
             MCTNode selectedNode = treePolicy(rootNode);
 
             double reward = simulateGame(selectedNode);
-            backpropagate(selectedNode, reward);
 
-            long currentNS = System.nanoTime();
-            deltaTimeNS = currentNS - lastNS;
-            lastNS = currentNS;
+            backpropagate(selectedNode, reward);
         }
 
         Optional<MCTNode> bestNode = rootNode.getChildren().stream().max(Comparator.comparingInt(MCTNode::getTimesVisited));
-        if(bestNode.isPresent()) {
-            return bestNode.get().parentAction;
+        while(bestNode.isPresent()) {
+            return bestNode.get().nextDir;
         }
 
         return null;
-    }
-    
-    private boolean terminate(long lastDeltaNS) {
-        long lastDeltaMillis = TimeUnit.MILLISECONDS.convert(lastDeltaNS, TimeUnit.NANOSECONDS);
-        long returnTimeMS = 2;
-        if(lastDeltaMillis + returnTimeMS > timeDue)
-            return true;
-        return false;
     }
     
     private MCTNode treePolicy(MCTNode currentNode) {
@@ -62,71 +51,83 @@ public class MCTS implements Constants {
         }
         
         if(!currentNode.isFullyExpanded()) {
-            return expandNode(currentNode);
+            expandNode(currentNode);
+            return currentNode.getBestChild();
         }
         
         if(currentNode.getChildren().isEmpty()) {
             return currentNode;
         }
-        
-        return treePolicy(currentNode.getBestChild());
+
+        boolean allChildsVisitsAboveMinVisitCount = 
+                currentNode.getChildren().parallelStream()
+                    .map(MCTNode::getTimesVisited)
+                    .min(Integer::compareTo).get() > 20;
+
+        if(allChildsVisitsAboveMinVisitCount) {
+            return treePolicy(currentNode.getBestChild());
+        }
+        else {
+            return treePolicy(currentNode.getChildren().get(random.nextInt(currentNode.getChildren().size())));
+        }
     }
 
     MCTNode expandNode(MCTNode parentNode) {
-        // FIXME: Change 140 magic number to Tree_Depth constant
-        ArrayList<DIR> pacmanMoves = parentNode.getPacmanMovesNotExpanded(140);
+        ArrayList<DIR> pacmanMoves = parentNode.getPacmanMovesNotExpanded(Utils.TREE_DEPTH);
         assert !pacmanMoves.isEmpty();
-        DIR pacmanDir = pacmanMoves.get(random.nextInt(pacmanMoves.size()));
     
-        SimResult result = Utils.simulateUntilNextJunction(parentNode.gameState.copy(), ghostsController, pacmanDir);
-    
-        MCTNode child = new MCTNode(result.gameState, parentNode.pathLengthInSteps + result.steps);
-        
-        child.parentAction = pacmanDir;
-        child.parent = parentNode;
-    
-        parentNode.getChildren().add(child);
-    
-        if(result.diedDuringSim || result.powerPillUnnecessarilyEaten) {
-            child.updateReward(-1);
-            child.setCanUpdate(false);
-    
-            return parentNode;
+        for(DIR move : pacmanMoves) {
+            GameStateInterface childGameState = parentNode.gameState.copy();
+            childGameState.next(move.ordinal(), ghostsController.getActions(childGameState));
+
+            MCTNode child = new MCTNode(childGameState, parentNode.pathLengthInSteps);
+            child.nextDir = move;
+            child.parent = parentNode;
+            parentNode.getChildren().add(child);
         }
     
-        return child;
+        return parentNode;
     }
 
     // * May need to change in order to optimise Score
     private double simulateGame(MCTNode selectedNode) {
         GameStateInterface simGameState = selectedNode.gameState.copy();
-        // FIXME: Change 140 magic number to Tree_Depth constant
-        int totalSteps = 140 - selectedNode.pathLengthInSteps;
+        int totalSteps = Utils.TREE_DEPTH - selectedNode.pathLengthInSteps;
         int remainingSteps = totalSteps;
         SimResult lastSimResult = new SimResult();
+        Node gamePreferredNode = Utils.gamePreferredNode(simGameState);
 
-        while(!Utils.analyzeGameState(simGameState, lastSimResult, remainingSteps, lastSimResult.powerPillUnnecessarilyEaten)) {
+        while(!Utils.analyzeGameState(simGameState, lastSimResult, remainingSteps, lastSimResult.powerPillUnnecessarilyEaten, gamePreferredNode)) {
             ArrayList<DIR> availableMoves = Utils.getPacmanMovesAtJunctionWithoutReverse(simGameState);
             DIR pacmanDir = availableMoves.get(random.nextInt(availableMoves.size()));
 
-            lastSimResult = Utils.simulateToNextJunctionOrLimit(simGameState, ghostsController, pacmanDir, remainingSteps);
+            lastSimResult = Utils.simulateToNextJunctionOrLimit(simGameState, ghostsController, pacmanDir, remainingSteps, gamePreferredNode);
 
             remainingSteps -= lastSimResult.steps;
         }
 
         if(lastSimResult.levelComplete) {
-            return 1;
+            return 1d;
         }
 
-        if(lastSimResult.diedDuringSim || lastSimResult.powerPillUnnecessarilyEaten) {
-            return 0;
+        if(lastSimResult.diedDuringSim) {
+            return 0d;
         }
 
-        if(Utils.getNumberActivePills(simGameState) == numOfActivePillsStart) {
-            return 0.1d * (1.d / numOfActivePillsStart);
+        if(lastSimResult.powerPillUnnecessarilyEaten) {
+            return 0.1d;
         }
 
-        return 1.0d - (Utils.getNumberActivePills(simGameState) / (double) numOfActivePillsStart);
+        // if(Utils.getNumberActivePills(simGameState) == numOfActivePillsStart) {
+        //     return 0.1d * (1.d / numOfActivePillsStart);
+        // }
+
+        if(lastSimResult.gamePreferredNodeHit) {
+            return 0.8d;
+        }
+
+        // return 1.0d - (Utils.getNumberActivePills(simGameState) / (double) numOfActivePillsStart);
+        return 0.6d;
     }
 
     private void backpropagate(MCTNode selectedNode, double reward) {

@@ -60,9 +60,9 @@ public class Utilities implements Constants {
         for (int i = 0; i < dx.length; i++) {
             if (dx[i] == xDiff && dy[i] == yDiff) {
                 // System.out.println("Direction: " + from + "\t " + to);
-//                System.out.println("diffs: " + xDiff + "\t " + yDiff);
-//                System.out.println("returning: " + i );
-//                System.out.println("");
+                // System.out.println("diffs: " + xDiff + "\t " + yDiff);
+                // System.out.println("returning: " + i );
+                // System.out.println("");
                 return i;
             }
         }

@@ -9,20 +9,25 @@ import screenpac.model.GameStateInterface;
 public class MCTSPacman implements AgentInterface, Constants{
     private DIR myDir = DIR.NEUTRAL;
     private GhostTeamController ghostsController;
-    private int timeDue;
+    private long timeDue;
+    private DIR nextDirs;
 
-    public MCTSPacman(GhostTeamController ghostsController, int timeDue) {
+    public MCTSPacman(GhostTeamController ghostsController, long timeDue) {
         this.ghostsController = ghostsController;
         this.timeDue = timeDue;
     }
-
+    
     @Override
     public int action(GameStateInterface gs) {
+        DIR nextMove = Utils.checkNearGhosts(gs);
+        if(nextMove != DIR.NEUTRAL) {
+            return nextMove.ordinal();
+        }
         MCTS mcts = new MCTS(gs, this.ghostsController, timeDue);
-        DIR nextDir = mcts.runMCTS();
+        this.nextDirs = mcts.runMCTS();
 
-        if(nextDir != null) {
-            myDir = nextDir;
+        if(nextDirs != null) {
+            myDir = nextDirs;
         }
 
         return myDir.ordinal();

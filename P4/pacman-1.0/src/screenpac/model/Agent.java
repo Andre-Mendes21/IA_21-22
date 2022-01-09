@@ -14,8 +14,6 @@ public class Agent implements Constants {
         // pacman traditionally starts moving left when placed
         // in the maze
         this.curDir = LEFT;
-        this.lastDir = curDir;
-
     }
 
     public Agent copy() {
@@ -32,8 +30,8 @@ public class Agent implements Constants {
         if (dir == NEUTRAL) dir = curDir;
         Node next = maze.getNode(current.x + dx[dir], current.y + dy[dir]);
         if (next != null) {
-            lastDir = curDir;
             current = next;
+            lastDir = curDir;
             curDir = dir;
         } else {
             next = maze.getNode(current.x + dx[curDir], current.y + dy[curDir]);
