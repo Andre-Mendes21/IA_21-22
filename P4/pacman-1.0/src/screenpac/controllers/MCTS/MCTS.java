@@ -116,11 +116,11 @@ public class MCTS implements Constants {
         PlaySound.enable();
 
         if(Utils.agentDeathSilent(simGameState)) {
-            return -3000d;
+            return -(3000d + simGameState.getScore());
         }
 
         if(Utils.wasPowerEaten(simGameState) && (Utils.hasEdibleGhost(simGameState) || !Utils.wasAGhostClose(simGameState))) {
-            return -25d;
+            return -(25d + simGameState.getScore());
         }
 
         double levelComplete = 0.0d;
