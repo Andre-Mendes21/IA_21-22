@@ -1,13 +1,8 @@
 package screenpac.controllers.MCTS;
 
-import java.awt.Color;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
-
-import screenpac.controllers.PathPlanner;
 import screenpac.controllers.MCTS.Utils.DIR;
 import screenpac.extract.Constants;
-import screenpac.features.Utilities;
 import screenpac.ghosts.GhostTeamController;
 import screenpac.model.GameStateInterface;
 import screenpac.model.Node;
@@ -19,7 +14,6 @@ public class MCTS implements Constants {
     private final Random random = new Random();
     private final GhostTeamController ghostsController;
 
-    private final int numOfActivePillsStart;
     private final long timeDue;
     private Node gamePreferredNode;
 
@@ -28,13 +22,11 @@ public class MCTS implements Constants {
         this.ghostsController = ghostsController;
         this.gamePreferredNode = Utils.gamePreferredNode(rootNode.gameState);
 
-        this.numOfActivePillsStart = Utils.getNumberActivePills(rootNode.gameState);
         this.timeDue = timeDue;
     }
 
     public GameStateInterface runMCTS() {
         Long timeStamp = System.currentTimeMillis();
-        int i = 0;
 
         while(System.currentTimeMillis() + 2 <= timeStamp + timeDue) {
             MCTNode selectedNode = treePolicy(rootNode);

@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import screenpac.controllers.MCTS.Utils.DIR;
 import screenpac.extract.Constants;
 import screenpac.model.GameStateInterface;
-import screenpac.model.Node;
 
 public class MCTNode implements Constants {
 	MCTNode parent;
@@ -42,19 +41,10 @@ public class MCTNode implements Constants {
 		this.canUpdate = true;
 	}
 
-	public MCTNode(MCTNode parent, DIR prevMove, ArrayList<DIR> legalMoves) {
-		this.parent = parent;
-		this.curTreeDepth = parent.curTreeDepth + 1;
-		this.nextDir = prevMove;
-		this.legalMoves = legalMoves;
-		this.children = new ArrayList<MCTNode>(legalMoves.size());
-	}
-
 	public double getReward() {
 		double childrenMax = children.stream().map(MCTNode::getReward).max(Double::compareTo).orElse(0d);
 
 		return Math.max(childrenMax * 0.5, reward);
-		// return reward;
 	}
 	
 	public double getUCB_Tuned() {
