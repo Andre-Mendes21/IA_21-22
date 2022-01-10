@@ -1,13 +1,17 @@
 package screenpac.controllers.MCTS;
 
+import java.awt.Color;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import screenpac.controllers.PathPlanner;
 import screenpac.controllers.MCTS.Utils.DIR;
 import screenpac.extract.Constants;
+import screenpac.features.Utilities;
 import screenpac.ghosts.GhostTeamController;
 import screenpac.model.GameStateInterface;
 import screenpac.model.Node;
+import screenpac.sound.PlaySound;
 
 public class MCTS implements Constants {
 
@@ -17,19 +21,22 @@ public class MCTS implements Constants {
 
     private final int numOfActivePillsStart;
     private final long timeDue;
+    private Node gamePreferredNode;
 
     public MCTS(GameStateInterface gameState, GhostTeamController ghostsController, long timeDue) {
-        this.rootNode = new MCTNode(gameState.copy(), 0);
+        this.rootNode = new MCTNode(gameState.copy());
         this.ghostsController = ghostsController;
+        this.gamePreferredNode = Utils.gamePreferredNode(rootNode.gameState);
 
-        this.numOfActivePillsStart = Utils.getNumberActivePills(gameState);
+        this.numOfActivePillsStart = Utils.getNumberActivePills(rootNode.gameState);
         this.timeDue = timeDue;
     }
 
-    public DIR runMCTS() {
+    public GameStateInterface runMCTS() {
         Long timeStamp = System.currentTimeMillis();
+        int i = 0;
 
-        while(System.currentTimeMillis() <= timeStamp + timeDue + 2) {
+        while(System.currentTimeMillis() + 2 <= timeStamp + timeDue) {
             MCTNode selectedNode = treePolicy(rootNode);
 
             double reward = simulateGame(selectedNode);
@@ -37,32 +44,34 @@ public class MCTS implements Constants {
             backpropagate(selectedNode, reward);
         }
 
-        Optional<MCTNode> bestNode = rootNode.getChildren().stream().max(Comparator.comparingInt(MCTNode::getTimesVisited));
+        Optional<MCTNode> bestNode = rootNode.getChildren().stream().max(Comparator.comparingDouble(MCTNode::getReward));
         while(bestNode.isPresent()) {
-            return bestNode.get().nextDir;
+            return bestNode.get().gameState;
         }
 
         return null;
     }
     
     private MCTNode treePolicy(MCTNode currentNode) {
-        if(currentNode.isGameOver()) {
+        if(currentNode.curTreeDepth > Utils.TREE_DEPTH || currentNode.isGameOver()) {
             return currentNode.parent != null ? currentNode.parent : currentNode;
+            // return currentNode;
         }
         
         if(!currentNode.isFullyExpanded()) {
             expandNode(currentNode);
             return currentNode.getBestChild();
         }
-        
+
         if(currentNode.getChildren().isEmpty()) {
             return currentNode;
         }
+        
 
         boolean allChildsVisitsAboveMinVisitCount = 
                 currentNode.getChildren().parallelStream()
                     .map(MCTNode::getTimesVisited)
-                    .min(Integer::compareTo).get() > 20;
+                    .min(Integer::compareTo).get() > Utils.MIN_NODE_VISIT_COUNT;
 
         if(allChildsVisitsAboveMinVisitCount) {
             return treePolicy(currentNode.getBestChild());
@@ -73,61 +82,61 @@ public class MCTS implements Constants {
     }
 
     MCTNode expandNode(MCTNode parentNode) {
-        ArrayList<DIR> pacmanMoves = parentNode.getPacmanMovesNotExpanded(Utils.TREE_DEPTH);
+        PlaySound.disable();
+        ArrayList<DIR> pacmanMoves = parentNode.getPacmanMovesNotExpanded();
         assert !pacmanMoves.isEmpty();
     
         for(DIR move : pacmanMoves) {
             GameStateInterface childGameState = parentNode.gameState.copy();
             childGameState.next(move.ordinal(), ghostsController.getActions(childGameState));
 
-            MCTNode child = new MCTNode(childGameState, parentNode.pathLengthInSteps);
+            MCTNode child = new MCTNode(childGameState);
             child.nextDir = move;
             child.parent = parentNode;
             parentNode.getChildren().add(child);
         }
-    
+        PlaySound.enable();
         return parentNode;
     }
 
     // * May need to change in order to optimise Score
     private double simulateGame(MCTNode selectedNode) {
+        PlaySound.disable();
         GameStateInterface simGameState = selectedNode.gameState.copy();
-        int totalSteps = Utils.TREE_DEPTH - selectedNode.pathLengthInSteps;
-        int remainingSteps = totalSteps;
-        SimResult lastSimResult = new SimResult();
-        Node gamePreferredNode = Utils.gamePreferredNode(simGameState);
 
-        while(!Utils.analyzeGameState(simGameState, lastSimResult, remainingSteps, lastSimResult.powerPillUnnecessarilyEaten, gamePreferredNode)) {
-            ArrayList<DIR> availableMoves = Utils.getPacmanMovesAtJunctionWithoutReverse(simGameState);
-            DIR pacmanDir = availableMoves.get(random.nextInt(availableMoves.size()));
+        for(int depth = selectedNode.curTreeDepth; depth < Utils.P; depth++) {
+            if(Utils.isPillsCleared(simGameState) || simGameState.terminal())  {
+                break;
+            }
+            ArrayList<DIR> legalMoves = Utils.getPacmanMovesAtJunctionWithoutReverse(simGameState);
+            DIR randomMove = legalMoves.get(random.nextInt(legalMoves.size()));
+            simGameState.next(randomMove.ordinal(), ghostsController.getActions(simGameState));
 
-            lastSimResult = Utils.simulateToNextJunctionOrLimit(simGameState, ghostsController, pacmanDir, remainingSteps, gamePreferredNode);
+        }
+        PlaySound.enable();
 
-            remainingSteps -= lastSimResult.steps;
+        if(Utils.agentDeathSilent(simGameState)) {
+            return -3000d;
         }
 
-        if(lastSimResult.levelComplete) {
-            return 1d;
+        if(Utils.wasPowerEaten(simGameState) && (Utils.hasEdibleGhost(simGameState) || !Utils.wasAGhostClose(simGameState))) {
+            return -25d;
         }
 
-        if(lastSimResult.diedDuringSim) {
-            return 0d;
+        double levelComplete = 0.0d;
+        if(Utils.isPillsCleared(simGameState)) {
+            levelComplete = 5d + simGameState.getLevel();
         }
 
-        if(lastSimResult.powerPillUnnecessarilyEaten) {
-            return 0.1d;
+        double gamePreferredNodeHit;
+        if(simGameState.getPacman().current.equals(gamePreferredNode)) {
+            gamePreferredNodeHit = 0.8d;
+        }
+        else {
+            gamePreferredNodeHit = 0.6d;
         }
 
-        // if(Utils.getNumberActivePills(simGameState) == numOfActivePillsStart) {
-        //     return 0.1d * (1.d / numOfActivePillsStart);
-        // }
-
-        if(lastSimResult.gamePreferredNodeHit) {
-            return 0.8d;
-        }
-
-        // return 1.0d - (Utils.getNumberActivePills(simGameState) / (double) numOfActivePillsStart);
-        return 0.6d;
+        return (1 + gamePreferredNodeHit + simGameState.getScore() + (levelComplete));
     }
 
     private void backpropagate(MCTNode selectedNode, double reward) {

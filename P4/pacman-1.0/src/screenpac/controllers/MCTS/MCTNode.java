@@ -11,41 +11,50 @@ import screenpac.model.Node;
 public class MCTNode implements Constants {
 	MCTNode parent;
 	DIR nextDir;
-	Node targetNode;
 
 	private int numOfVisits;
 	private double reward;
 
 	private ArrayList<MCTNode> children;
 	GameStateInterface gameState;
+	int curTreeDepth;
+	private ArrayList<DIR> legalMoves;
 
 	private boolean canUpdate;
 
-	int pathLengthInSteps;
 
 	/**
-	 * Default Constructor
+	 * Root node Constructor
 	 * @param game	 The copied game state
-	 * @param pathLengthInSteps 
 	 */
-	public MCTNode(GameStateInterface game, int pathLengthInSteps) {
+	public MCTNode(GameStateInterface game) {
 		this.parent = null;
 		this.nextDir = null;
 
 		this.numOfVisits = 0;
 		this.reward = 0;
 
-		this.children = new ArrayList<MCTNode>();
 		this.gameState = game;
+		this.curTreeDepth = 0;
+		this.legalMoves = Utils.getPacmanMovesWithoutNeutral(gameState);
+		this.children = new ArrayList<MCTNode>(legalMoves.size());
 
 		this.canUpdate = true;
-		this.pathLengthInSteps = pathLengthInSteps;
+	}
+
+	public MCTNode(MCTNode parent, DIR prevMove, ArrayList<DIR> legalMoves) {
+		this.parent = parent;
+		this.curTreeDepth = parent.curTreeDepth + 1;
+		this.nextDir = prevMove;
+		this.legalMoves = legalMoves;
+		this.children = new ArrayList<MCTNode>(legalMoves.size());
 	}
 
 	public double getReward() {
 		double childrenMax = children.stream().map(MCTNode::getReward).max(Double::compareTo).orElse(0d);
 
 		return Math.max(childrenMax * 0.5, reward);
+		// return reward;
 	}
 	
 	public double getUCB_Tuned() {
@@ -63,7 +72,7 @@ public class MCTNode implements Constants {
 	}
 
 	public boolean isFullyExpanded() {
-		return getPacmanMovesNotExpanded(Utils.TREE_DEPTH).isEmpty();
+		return !children.isEmpty();
 	}
 
 	public ArrayList<DIR> getPacmanMovesWithoutReverse() {
@@ -76,17 +85,12 @@ public class MCTNode implements Constants {
 		return moves;
 	}
 
-	public ArrayList<DIR> getPacmanMovesNotExpanded(final int MAX_PATH_LENGTH) {
-		if(this.pathLengthInSteps > 0.8d * MAX_PATH_LENGTH) {
-			return new ArrayList<>();
-		}
-		else {
-			ArrayList<DIR> moves = this.getPacmanMovesWithoutReverse();
+	public ArrayList<DIR> getPacmanMovesNotExpanded() {
+		ArrayList<DIR> moves = this.getPacmanMovesWithoutReverse();
 
-			moves.removeAll(children.parallelStream().map(child -> child.nextDir).collect(Collectors.toList()));
+		moves.removeAll(children.parallelStream().map(child -> child.nextDir).collect(Collectors.toList()));
 
-			return moves;
-		}
+		return moves;
 	}
 
 	public MCTNode getBestChild() {
@@ -113,7 +117,7 @@ public class MCTNode implements Constants {
 	}
 
 	public boolean isGameOver() {
-		return Utils.agentDeathSilent(gameState) || Utils.getNumberActivePills(gameState) == 0;
+		return Utils.agentDeathSilent(gameState) || Utils.getNumberActivePills(gameState) + Utils.getNumberActivePowerPills(gameState) == 0;
 	}
 
 	public void updateReward(double deltaReward) {
@@ -126,25 +130,6 @@ public class MCTNode implements Constants {
 	public void setCanUpdate(boolean canUpdate) {
 		this.canUpdate = canUpdate;
 	}
-
-	public String path() {
-        Stack<MCTNode> pathStack = new Stack<>();
-        MCTNode currentNode = this;
-
-        while (currentNode.parent != null) {
-            pathStack.push(currentNode);
-            currentNode = currentNode.parent;
-        }
-
-        StringBuilder sb = new StringBuilder();
-        while (!pathStack.empty()) {
-            MCTNode node = pathStack.pop();
-            sb.append('/');
-            sb.append(node.nextDir);
-        }
-
-        return sb.toString();
-    }
 
 
 	/**
@@ -159,17 +144,4 @@ public class MCTNode implements Constants {
 	public ArrayList<MCTNode> getChildren() {
 		return this.children;
 	}
-
-	@Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(path() + " distance: " + pathLengthInSteps);
-        sb.append(" - Children ");
-        for(MCTNode child : children) {
-            sb.append(" || [" + child.nextDir + "] ");
-            sb.append("r/s: " + child.reward + "/" + child.numOfVisits);
-        }
-
-        return sb.toString();
-    }
 }

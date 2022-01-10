@@ -16,7 +16,10 @@ import screenpac.features.Utilities;
 
 public class Utils implements Constants {
 
-	final static int TREE_DEPTH = 140;
+	final static int TREE_DEPTH = 500;
+	final static double P = ((double) TREE_DEPTH / 5d) - 1d;
+	final static int G = 50;
+    public static final int MIN_NODE_VISIT_COUNT = 35;
 
 	public enum DIR {
 		UP (0) {
@@ -71,7 +74,7 @@ public class Utils implements Constants {
 	}
 
 	public static boolean isPillsCleared(GameStateInterface gameState) {
-		return gameState.getPills().isEmpty() || gameState.getPowers().isEmpty();
+		return gameState.getPills().isEmpty() && gameState.getPowers().isEmpty();
 	}
 
 	public static boolean agentDeathSilent(GameStateInterface gameState) {
@@ -114,45 +117,13 @@ public class Utils implements Constants {
 		return pacmanMoves;
 	}
 
-	public static boolean isJunction(Node node) {
-		return node.adj.size() > 2;
-	}
-
-	public static SimResult simulateUntilNextJunction(GameStateInterface gameState, GhostTeamController ghostController, DIR dir, Node gamePreferredNode) {
-		SimResult result = simulateToNextJunctionOrLimit(gameState, ghostController, dir, TREE_DEPTH, gamePreferredNode);
-
-		return result;
-	}
-
-	public static SimResult simulateToNextJunctionOrLimit(GameStateInterface gameState, GhostTeamController ghostController, DIR dir, int maxSteps, Node gamePreferredNode) {
-		SimResult result = new SimResult();
-		PathPlanner pathPlanner = new PathPlanner(gameState.getMaze());
-
-		DIR pacmanNextDir = dir;
-		boolean hadEdibleGhost;
-		
-		do {
-			Node currentPacmanNode = gameState.getPacman().current; 
-			Node nextNode = pathPlanner.getPath(currentPacmanNode, gamePreferredNode).remove(0);
-			int nextDir = Utilities.getDirection(currentPacmanNode, nextNode);
-
-			pacmanNextDir = DIR.values()[nextDir];
-			// pacmanNextDir = getPacmanMoveAlongPath(gameState, pacmanNextDir);
-
-			hadEdibleGhost = hasEdibleGhost(gameState);
-			gameState.next(pacmanNextDir.ordinal(), ghostController.getActions(gameState));
-
-			++result.steps;
-			--maxSteps;
-		} while(!analyzeGameState(gameState, result, maxSteps, hadEdibleGhost, gamePreferredNode));
-
-		result.gameState = gameState;
-
-		return result;
-	}
-
 	public static boolean analyzeGameState(GameStateInterface gameState, SimResult result, int remainingSteps, boolean hadEdibleGhost, Node gamePreferredNode) {
 		boolean shouldStop = false;
+
+		if(gameState.terminal()) {
+			result.gameOver = true;
+			shouldStop = true;
+		}
 
 		if(isPillsCleared(gameState)) {
 			result.levelComplete = true;
@@ -174,7 +145,7 @@ public class Utils implements Constants {
 			shouldStop = true;
 		}
 		
-		if(remainingSteps <= 0) {
+		if(remainingSteps >= Utils.P) {
 			shouldStop = true;
 		}
 		return shouldStop;
@@ -186,7 +157,7 @@ public class Utils implements Constants {
 		
 		for(GhostState ghost : gameState.getGhosts()) {
 			Node ghostNode = ghost.current;
-			if(Utilities.manhattan(pacmanNode, ghostNode) <= 20) {
+			if(gameState.getMaze().dist(pacmanNode, ghostNode) <= G) {
 				return true;
 			}
 		}
@@ -206,7 +177,7 @@ public class Utils implements Constants {
 
 	public static boolean hasEdibleGhost(GameStateInterface gameState) {
 		for(GhostState ghost : gameState.getGhosts()) {
-			if(ghost.edible()) {
+			if(ghost.edible() && !ghost.returning()) {
 				return true;
 			}
 		}
@@ -233,36 +204,49 @@ public class Utils implements Constants {
 
 	public static Node nearestEdibleGhost(GameStateInterface gameState) {
 		Node pacmanNode = gameState.getPacman().current;
-		int G = 20;
-		
+		Node closestGhost = null;
 		for(GhostState ghost : gameState.getGhosts()) {
 			Node ghostNode = ghost.current;
-			if(ghost.edible() && Utilities.manhattan(pacmanNode, ghostNode) < G) {
-				ghostNode.col = Color.CYAN;
-				return ghostNode;
+			if((ghost.edible() && !ghost.returning()) && gameState.getMaze().dist(pacmanNode, ghostNode) <= G) {
+				closestGhost = ghostNode;
+				closestGhost.col = Color.CYAN;
 			}
 		}
-		return null;
+		return closestGhost;
 	}
 
 	public static Node nearestPill(GameStateInterface gameState) {
-		double P = ((double) TREE_DEPTH / 5d) - 1d;
 		NearestPillDistance npd = new NearestPillDistance();
 		Node pacmanNode = gameState.getPacman().current;
-
+		double pillDist = npd.score(gameState, pacmanNode);
+		
 		for(GhostState ghost : gameState.getGhosts()) {
-			if(!ghost.edible() && npd.score(gameState, pacmanNode) < P) {
+			if((!ghost.edible() || ghost.returning()) && pillDist < P) {
+				npd.closest.col = Color.green;
 				return npd.closest;
 			}
 		}
-		return Utilities.getClosest(pacmanNode.adj, npd.closest, gameState.getMaze());
+
+		PathPlanner pathPlanner = new PathPlanner(gameState.getMaze());
+		ArrayList<Node> path = pathPlanner.getPath(pacmanNode, npd.closest);
+		Node nearestNode = path.get(path.size() - 1);
+		for(int i = path.size() - 1; i > 0; i--) {
+			if(gameState.getMaze().dist(pacmanNode, nearestNode) < P) {
+				nearestNode = path.get(i);
+				break;
+			}
+			nearestNode = path.get(i);
+		}
+
+		nearestNode.col = Color.ORANGE;
+		return nearestNode;
 	}
 
 	public static DIR checkNearGhosts(GameStateInterface gameState) {
         DIR move = DIR.NEUTRAL;
         double maxDistance = Integer.MIN_VALUE;
 		Node pacmanNode = gameState.getPacman().current;
-		int G = 20;
+		int G = 50;
 			
 		for(GhostState ghost : gameState.getGhosts()) {
 			Node ghostNode = ghost.current;

@@ -27,9 +27,9 @@ public class NearestPillDistance implements NodeScore {
                 }
             }
         }
-        if (closest != null) {
-            closest.col = Color.green;
-        }
+        // if (closest != null) {
+        //     closest.col = Color.green;
+        // }
         return minDist;
     }
 }
