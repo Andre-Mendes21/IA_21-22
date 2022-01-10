@@ -117,41 +117,6 @@ public class Utils implements Constants {
 		return pacmanMoves;
 	}
 
-	public static boolean analyzeGameState(GameStateInterface gameState, SimResult result, int remainingSteps, boolean hadEdibleGhost, Node gamePreferredNode) {
-		boolean shouldStop = false;
-
-		if(gameState.terminal()) {
-			result.gameOver = true;
-			shouldStop = true;
-		}
-
-		if(isPillsCleared(gameState)) {
-			result.levelComplete = true;
-			shouldStop = true;
-		}
-
-		if(agentDeathSilent(gameState)) {
-			result.diedDuringSim = true;
-			shouldStop = true;
-		}
-
-		if(wasPowerEaten(gameState) && (hadEdibleGhost || !wasAGhostClose(gameState))) {
-			result.powerPillUnnecessarilyEaten = true;
-			shouldStop = true;
-		}
-
-		if(gameState.getPacman().current.equals(gamePreferredNode)) {
-			result.gamePreferredNodeHit = true;
-			shouldStop = true;
-		}
-		
-		if(remainingSteps >= Utils.P) {
-			shouldStop = true;
-		}
-		return shouldStop;
-	}
-
-	// FIXME: May not work as intended, needs to find shortest distance to ghost, Manhatten distance may not be suited
 	public static boolean wasAGhostClose(GameStateInterface gameState) {
 		Node pacmanNode = gameState.getPacman().current;
 		
@@ -162,17 +127,6 @@ public class Utils implements Constants {
 			}
 		}
 		return false;
-	}
-
-
-	public static DIR getPacmanMoveAlongPath(GameStateInterface gameState, DIR dir) {
-		ArrayList<DIR> moves = getPacmanMovesWithoutNeutral(gameState);
-		if(moves.contains(dir)) {
-			return dir;
-		}
-		moves.remove(gameState.getPacman().getPacmanLastMoveMade().opposite());
-
-		return moves.get(0);
 	}
 
 	public static boolean hasEdibleGhost(GameStateInterface gameState) {
@@ -241,28 +195,4 @@ public class Utils implements Constants {
 		nearestNode.col = Color.ORANGE;
 		return nearestNode;
 	}
-
-	public static DIR checkNearGhosts(GameStateInterface gameState) {
-        DIR move = DIR.NEUTRAL;
-        double maxDistance = Integer.MIN_VALUE;
-		Node pacmanNode = gameState.getPacman().current;
-		int G = 50;
-			
-		for(GhostState ghost : gameState.getGhosts()) {
-			Node ghostNode = ghost.current;
-			if(!ghost.edible() && Utilities.manhattan(pacmanNode, ghostNode) <= G) {
-				for (Node a : pacmanNode.adj) {
-					double distance = Utilities.manhattan(a, ghostNode);
-					
-					if (distance > maxDistance) {
-						maxDistance = distance;
-						move = DIR.values()[Utilities.getDirection(a, ghostNode)].opposite();
-					}
-				}
-				return move;
-			}
-		}
-			
-		return DIR.NEUTRAL;
-    }
 }

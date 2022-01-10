@@ -1,12 +1,10 @@
 package screenpac.features;
 
 import screenpac.model.*;
-import screenpac.controllers.MCTS.SimResult;
 import screenpac.extract.Constants;
 import screenpac.ghosts.GhostTeamController;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Utilities implements Constants {
     public static Node getMin(ArrayList<Node> nodes, NodeScore f, GameStateInterface gs) {
