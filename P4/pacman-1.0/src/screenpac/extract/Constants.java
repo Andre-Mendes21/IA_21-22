@@ -13,7 +13,7 @@ public interface Constants {
 
     // constants in an interface are public static by default
     Random rand = new Random();
-    int nLives = 3;
+    int nLives = 4;
     int nGhosts = 4;
     
     int DIV = 2;

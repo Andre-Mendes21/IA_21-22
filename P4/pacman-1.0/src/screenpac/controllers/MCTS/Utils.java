@@ -122,7 +122,7 @@ public class Utils implements Constants {
 		
 		for(GhostState ghost : gameState.getGhosts()) {
 			Node ghostNode = ghost.current;
-			if(gameState.getMaze().dist(pacmanNode, ghostNode) <= G) {
+			if(gameState.getMaze().dist(pacmanNode, ghostNode) < G) {
 				return true;
 			}
 		}
@@ -161,7 +161,7 @@ public class Utils implements Constants {
 		Node closestGhost = null;
 		for(GhostState ghost : gameState.getGhosts()) {
 			Node ghostNode = ghost.current;
-			if((ghost.edible() && !ghost.returning()) && gameState.getMaze().dist(pacmanNode, ghostNode) <= G) {
+			if((ghost.edible() && !ghost.returning()) && gameState.getMaze().dist(pacmanNode, ghostNode) < G) {
 				closestGhost = ghostNode;
 				closestGhost.col = Color.CYAN;
 			}

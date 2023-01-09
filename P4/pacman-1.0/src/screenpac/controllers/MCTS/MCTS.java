@@ -39,7 +39,7 @@ public class MCTS implements Constants {
     public GameStateInterface runMCTS() {
         Long timeStamp = System.currentTimeMillis();
 
-        while(System.currentTimeMillis() + 2 <= timeStamp + timeDue) {
+        while(System.currentTimeMillis() <= timeStamp + timeDue) {
             MCTNode selectedNode = treePolicy(rootNode);
 
             double reward = simulateGame(selectedNode);
@@ -133,7 +133,7 @@ public class MCTS implements Constants {
         GameStateInterface simGameState = selectedNode.gameState.copy();
 
         for(int depth = selectedNode.curTreeDepth; depth < Utils.P; depth++) {
-            if(Utils.isPillsCleared(simGameState) || simGameState.terminal())  {
+            if(simGameState.agentDeath() || Utils.isPillsCleared(simGameState) || simGameState.terminal())  {
                 break;
             }
             ArrayList<DIR> legalMoves = Utils.getPacmanMovesAtJunctionWithoutReverse(simGameState);
@@ -144,11 +144,11 @@ public class MCTS implements Constants {
         PlaySound.enable();
 
         if(Utils.agentDeathSilent(simGameState)) {
-            return -(3000d + simGameState.getScore());
+            return -(50d + simGameState.getScore());
         }
 
         if(Utils.wasPowerEaten(simGameState) && (Utils.hasEdibleGhost(simGameState) || !Utils.wasAGhostClose(simGameState))) {
-            return -(25d + simGameState.getScore());
+            return -(0.35d + simGameState.getScore());
         }
 
         double levelComplete = 0.0d;
@@ -164,7 +164,7 @@ public class MCTS implements Constants {
             gamePreferredNodeHit = 0.6d;
         }
 
-        return (1 + gamePreferredNodeHit + simGameState.getScore() + (levelComplete));
+        return (1 + gamePreferredNodeHit + simGameState.getScore() + levelComplete);
     }
 
     /**
