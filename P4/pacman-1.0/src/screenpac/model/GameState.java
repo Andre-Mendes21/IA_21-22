@@ -8,19 +8,6 @@ import java.util.BitSet;
 
 public class GameState implements GameStateInterface, Constants {
 
-    // todo: vary the edible time depending on the level
-    // simply have a level counter, then define a function
-    // which returns the edible time
-
-    // todo: also consider changing the scoring function to give points for time staying alive
-
-    // todo: replace the reference to the Maze object with an integer that specifies
-    // the maze - should make it much easier to serialize
-
-    // todo: mention in the talk: variations on Pac-Man e.g. new sensor model
-    // for ghosts - the down corridor look
-    // find slim shady video - Pac-Man could send out decoys!
-
     public int getLivesRemaining() {
         return nLivesRemaining;
     }
@@ -64,7 +51,7 @@ public class GameState implements GameStateInterface, Constants {
     public Maze maze;
     public BitSet powers;
     public BitSet pills;
-    public Agent pacMan;// what is the difference between a ghost and a Pac-Man?
+    public Agent pacMan; // what is the difference between a ghost and a Pac-Man?
     public GhostState[] ghosts;
     public int score = 0;
     int level;
@@ -90,7 +77,6 @@ public class GameState implements GameStateInterface, Constants {
         gs.nLivesRemaining = nLivesRemaining;
         return gs;
     }
-
 
     public GameState() {
         this(Level.getMaze(0));
@@ -143,7 +129,8 @@ public class GameState implements GameStateInterface, Constants {
 
     public void next(int pacDir, int[] ghostDirs) {
         // calculate the next game state for agent and ghosts
-        // System.out.println("nPills = " + pills.cardinality() + " : " + powers.cardinality());
+        // System.out.println("nPills = " + pills.cardinality() + " : " +
+        // powers.cardinality());
         pacMan.next(pacDir, maze);
         tryEatPill();
         tryEatPower();
@@ -170,7 +157,8 @@ public class GameState implements GameStateInterface, Constants {
     }
 
     public void reverseGhosts() {
-        for (GhostState g : ghosts) g.reverse();
+        for (GhostState g : ghosts)
+            g.reverse();
     }
 
     public void moveGhosts(int[] ghostDirs) {
@@ -216,7 +204,7 @@ public class GameState implements GameStateInterface, Constants {
     // now define a series of tests on the game state
 
     public boolean pillsCleared() {
-        
+
         return pills.isEmpty() && powers.isEmpty();
     }
 
@@ -251,7 +239,7 @@ public class GameState implements GameStateInterface, Constants {
     }
 
     public static boolean overlap(GhostState g, Agent agent) {
-        return Utilities.manhattan(g.current, agent.current)
-                <= agentOverlapDistance;
+        return Utilities.manhattan(g.current, agent.current) <= agentOverlapDistance;
     }
+
 }

@@ -6,8 +6,6 @@ import java.util.ArrayList;
 
 import games.pacman.view.DisplayComponent;
 import games.pacman.view.Drawable;
-import games.pacman.maze.OldMaze;
-import games.pacman.maze.Line;
 
 public class MazeTwo {
 

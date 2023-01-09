@@ -2,6 +2,7 @@ package screenpac.features;
 
 import screenpac.model.*;
 import screenpac.extract.Constants;
+import screenpac.ghosts.GhostTeamController;
 
 import java.util.ArrayList;
 
@@ -57,15 +58,15 @@ public class Utilities implements Constants {
         for (int i = 0; i < dx.length; i++) {
             if (dx[i] == xDiff && dy[i] == yDiff) {
                 // System.out.println("Direction: " + from + "\t " + to);
-//                System.out.println("diffs: " + xDiff + "\t " + yDiff);
-//                System.out.println("returning: " + i );
-//                System.out.println("");
+                // System.out.println("diffs: " + xDiff + "\t " + yDiff);
+                // System.out.println("returning: " + i );
+                // System.out.println("");
                 return i;
             }
         }
         System.out.println("Error in Util.getDirection");
-        throw new RuntimeException("Error in getDirection " + from + " : " + to);
-        // return 0;
+        // throw new RuntimeException("Error in getDirection " + from + " : " + to);
+        return 0;
     }
 
 
@@ -73,11 +74,7 @@ public class Utilities implements Constants {
         int w = maze.getWidth();
         int h = maze.getHeight();
         for (int i = 0; i < dx.length; i++) {
-            if (
-                    ((a.x + dx[i] + w) % w == b.x) &&
-                    ((a.y + dy[i] +h) % h == b.y)
-                    )
-            {
+            if (((a.x + dx[i] + w) % w == b.x) && ((a.y + dy[i] + h) % h == b.y)) {
                 return i;
             }
         }

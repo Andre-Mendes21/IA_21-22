@@ -45,19 +45,19 @@ public class MapView extends JComponent implements Constants {
             g.drawImage(bg, 2, 6, null);
         }
         g.setColor(Color.cyan);
-        for (Node n : maze.getMap()) {
-//            g.fillRect(n.x * MAG - 9, n.y * MAG - 9, 18, 18);
-        }
+        // for (Node n : maze.getMap()) {
+        //    g.fillRect(n.x * MAG - 9, n.y * MAG - 9, 18, 18);
+        // }
         g.setColor(Color.black);
-        for (Node n : maze.getMap()) {
-//            g.fillRect(n.x * MAG - 8, n.y * MAG - 8, 16, 16);
-        }
+        // for (Node n : maze.getMap()) {
+        //    g.fillRect(n.x * MAG - 8, n.y * MAG - 8, 16, 16);
+        // }
 
  //        only use this to show the true graph nodes
- //        g.setColor(Color.red);
- //        for (Node n : maze.getMap()) {
- //            g.fillRect(n.x * MAG - 0, n.y * MAG - 1, 1, 1);
- //        }
+        // g.setColor(Color.red);
+        // for (Node n : maze.getMap()) {
+        //     g.fillRect(n.x * MAG - 0, n.y * MAG - 1, 1, 1);
+        // }
 
      // these are part of the game state rather than the map
      // so need to consider which pills are still there

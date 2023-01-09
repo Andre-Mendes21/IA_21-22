@@ -1,7 +1,7 @@
 package screenpac.features;
 
 import screenpac.model.Node;
-import screenpac.model.GameState;
+// import screenpac.model.GameState;
 import screenpac.model.GameStateInterface;
 
 import java.awt.*;
@@ -27,9 +27,9 @@ public class NearestPillDistance implements NodeScore {
                 }
             }
         }
-        if (closest != null) {
-            closest.col = Color.green;
-        }
+        // if (closest != null) {
+        //     closest.col = Color.green;
+        // }
         return minDist;
     }
 }

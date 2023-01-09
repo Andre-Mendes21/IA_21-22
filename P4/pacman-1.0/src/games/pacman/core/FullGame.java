@@ -8,9 +8,9 @@ import games.pacman.ghost.Ghost;
 import games.pacman.maze.OldMaze;
 import games.pacman.maze.MazeOne;
 import games.pacman.maze.MazeNode;
-import games.pacman.core.PacMan;
-import games.pacman.core.GameFrame;
 import utilities.ElapsedTimer;
+// import games.pacman.core.PacMan;
+// import games.pacman.core.GameFrame;
 
 
 public class FullGame {

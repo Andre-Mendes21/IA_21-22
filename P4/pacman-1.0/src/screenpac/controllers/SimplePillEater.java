@@ -8,8 +8,8 @@ import screenpac.extract.Constants;
 
 public class SimplePillEater implements AgentInterface, Constants {
     /*
-    This simple pill eater just heads for the nearest pill each time
-     */
+        This simple pill eater just heads for the nearest pill each time
+    */
     NearestPillDistance npd;
 
     public SimplePillEater() {

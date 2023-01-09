@@ -11,11 +11,11 @@ public class Level {
     public static void main(String[] args) {
         System.out.println(mazes.size());
         System.out.println("Made the mazes");
-        for (int i=0; i<20; i++) {
+        for (int i = 0; i < 20; i++) {
             System.out.println(i + "\t " + edibleTime(i));
         }
     }
-    
+
     static ArrayList<Maze> mazes;
     // load the mazes
     static {
@@ -49,6 +49,7 @@ public class Level {
 
     static int maxEdibleTime = 150;
     static double edibleTimeReductionFactor = 0.67;
+
     static int edibleTime(int level) {
         return (int) (maxEdibleTime *
                 Math.pow(edibleTimeReductionFactor, level));

@@ -1,9 +1,12 @@
 package screenpac.model;
 
-import java.util.ArrayList;
+import java.util.*;
+
+import screenpac.extract.Constants;
+
 import java.awt.*;
 
-public class Node {
+public class Node implements Constants {
     // nodes carry pill and power pill indices which default to -1
     // meaning that there is neither a pill nor a power pill at this
     // current
@@ -14,7 +17,7 @@ public class Node {
     // in this way the game state can be cleanly separated from the
     // maze layout
 
-    public int x,y;
+    public int x, y;
     public int nodeIndex;
 
     public int pillIndex;
@@ -27,6 +30,10 @@ public class Node {
         adj = new ArrayList<Node>();
         pillIndex = -1;
         powerIndex = -1;
+    }
+
+    public ArrayList<Node> getAdjacentNodes() {
+        return this.adj;
     }
 
     public String toString() {

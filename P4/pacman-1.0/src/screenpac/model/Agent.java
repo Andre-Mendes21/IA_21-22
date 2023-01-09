@@ -1,17 +1,19 @@
 package screenpac.model;
 
+import screenpac.controllers.MCTS.Utils.DIR;
 import screenpac.extract.Constants;
 
 public class Agent implements Constants {
     // the only state of a PacMan agent is it's current current in the maze
     public Node current;
     int curDir;
+    int lastDir;
 
     public Agent(Node current) {
         this.current = current;
         // pacman traditionally starts moving left when placed
         // in the maze
-        curDir = LEFT;
+        this.curDir = LEFT;
     }
 
     public Agent copy() {
@@ -29,11 +31,17 @@ public class Agent implements Constants {
         Node next = maze.getNode(current.x + dx[dir], current.y + dy[dir]);
         if (next != null) {
             current = next;
+            lastDir = curDir;
             curDir = dir;
         } else {
             next = maze.getNode(current.x + dx[curDir], current.y + dy[curDir]);
-            if (next != null) current = next;
+            if (next != null) 
+                current = next;
         }
         return current;
+    }
+
+    public DIR getPacmanLastMoveMade() {
+        return DIR.values()[lastDir];
     }
 }

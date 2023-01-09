@@ -57,6 +57,7 @@ public class SmartController implements PacController {
         }
     }
 
+    /*
     private MazeNode getBest(MazeNode[] poss) {
         // a free choice of nodes
         MazeNode bestNode = null;
@@ -73,7 +74,8 @@ public class SmartController implements PacController {
         }
         return bestNode;
     }
-
+    */
+    
     private MazeNode getBest(MazeNode[] poss, MazeNode previous) {
         MazeNode bestNode = null;
         int bestScore = 0;
