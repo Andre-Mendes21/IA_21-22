@@ -5,7 +5,7 @@ A collection of group assignments done in the class of Artificial Intelligence i
 ## Repository Structure
 
 The repository is structured as follows:
-- Each folder is an assignment, contained within each folder is a ```.pdf``` file which is the objective of the that assignment.
+- Each folder is an assignment, contained within each folder is a ```.pdf``` file which is the objective of that assignment.
 - Within each folder there is a ```src``` folder containing the source code.
 
 ### Notes
